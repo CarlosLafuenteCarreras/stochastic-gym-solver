@@ -25,7 +25,7 @@ def run_once(model: Model, env: gym.Env, max_steps: int, show_observation: bool,
     return fitness, max_steps
 
 
-def run_once_thin(model: Model, env: gym.Env, max_steps: int, show_observation: bool, show_action: bool):    
+def run_once_thin(model: Model, env: gym.Env, max_steps: int):    
     observation, _ = env.reset()
     fitness = 0.0
 
@@ -42,6 +42,9 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int, show_observation: 
 def run_once_thin_wrapper(args):
     return run_once_thin(*args)
 
+def build_task_params(args):
+    return (args[0], gym.make(args[1]), args[2])
+
 def run_simulation(models: list[Model], 
                    env: str, 
                    max_steps: int, 
@@ -55,24 +58,27 @@ def run_simulation(models: list[Model],
 
         return np.array([fitness]), np.array([lenght])
 
-
     tasks = [
-        (model, gym.make(env), max_steps, False, False)
+        (model, gym.make(env), max_steps)
         for model in itertools.islice(itertools.cycle(models), repetitions*len(models))
-    ] 
+    ]
 
     with ProcessPoolExecutor() as executor:
-        results = list(tqdm(executor.map(run_once_thin_wrapper, tasks), total=len(tasks)))
+        results = tqdm(executor.map(run_once_thin_wrapper, tasks), total=repetitions*len(models))
         fitnesses, lengths = zip(*results)
         return np.array(fitnesses).reshape(repetitions, len(models)), np.array(lengths).reshape(repetitions, len(models))
 
 
 if __name__ == "__main__":
     from models import RandomModel
+    import time
+    models = [RandomModel() for _ in range(500)] # type: list[Model]
 
-    models = [RandomModel() for _ in range(50)] # type: list[Model]
+    start_time = time.time()
+    fitness, lenghts = run_simulation(models, "BipedalWalker-v3", 500, repetitions=10, render=False, show_observation=False, show_action=False)
+    end_time = time.time()
 
-    fitness, lenghts = run_simulation(models, "BipedalWalker-v3", 300, repetitions=10, render=False, show_observation=False, show_action=False)
+    print(f"Execution time: {end_time - start_time} seconds")
 
     print(fitness, lenghts)
     print(fitness.shape, lenghts.shape)
