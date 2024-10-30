@@ -2,7 +2,7 @@ import itertools
 import gymnasium as gym
 from tqdm import tqdm
 import numpy as np
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from models import Model
 
 def run_once(model: Model, env: gym.Env, max_steps: int, show_observation: bool, show_action: bool):    
