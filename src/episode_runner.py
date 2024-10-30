@@ -93,7 +93,7 @@ if __name__ == "__main__":
     models = [RandomModel() for _ in range(500)] # type: list[Model]
 
     start_time = time.time()
-    fitness, lenghts = run_simulation(models, "LunarLander-v3", 150, repetitions=100, batch_size=50)
+    fitness, lenghts = run_simulation(models, ("LunarLander-v3", dict(continuous=True)), 150, repetitions=100, batch_size=50)
     end_time = time.time()
 
     print(f"Execution time: {end_time - start_time} seconds")
