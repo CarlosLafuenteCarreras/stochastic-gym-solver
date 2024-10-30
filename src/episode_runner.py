@@ -42,13 +42,20 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
 def run_once_thin_wrapper(args):
     return run_once_thin(*args)
 
-def build_task_params(args):
-    return (args[0], gym.make(args[1]), args[2])
+def run_batch(args):
+    model, env, max_steps, batch_size = args
+    
+    return [run_once_thin(model, env, max_steps) for _ in range(batch_size)]
+
+
+
+
 
 def run_simulation(models: list[Model], 
                    env: str, 
                    max_steps: int, 
                    repetitions: int = 1, 
+                   batch_size = 100,
                    render: bool = False, 
                    show_observation: bool = False, 
                    show_action: bool = False) -> tuple[np.ndarray, np.ndarray]:
@@ -57,25 +64,29 @@ def run_simulation(models: list[Model],
         fitness, lenght = run_once(models[0], gym.make(env, render_mode=render_mode), max_steps, show_observation, show_action)
 
         return np.array([fitness]), np.array([lenght])
-
+    
+    # check if batch_size is a multiple of len(models)
+    if (len(models) * repetitions) % batch_size != 0:
+        raise ValueError("batch_size must be a multiple of len(models)")
+    
     tasks = [
-        (model, gym.make(env), max_steps)
-        for model in itertools.islice(itertools.cycle(models), repetitions*len(models))
+        (model, gym.make(env), max_steps, batch_size)
+        for model in itertools.islice(itertools.cycle(models), repetitions*len(models)//batch_size)
     ]
 
     with ProcessPoolExecutor() as executor:
-        results = tqdm(executor.map(run_once_thin_wrapper, tasks), total=repetitions*len(models))
-        fitnesses, lengths = zip(*results)
+        results = tqdm(executor.map(run_batch, tasks), total=repetitions*len(models)//batch_size)
+        fitnesses, lengths = zip(*itertools.chain.from_iterable(results))
         return np.array(fitnesses).reshape(repetitions, len(models)), np.array(lengths).reshape(repetitions, len(models))
 
 
 if __name__ == "__main__":
     from models import RandomModel
     import time
-    models = [RandomModel() for _ in range(500)] # type: list[Model]
+    models = [RandomModel() for _ in range(5000)] # type: list[Model]
 
     start_time = time.time()
-    fitness, lenghts = run_simulation(models, "BipedalWalker-v3", 500, repetitions=10, render=False, show_observation=False, show_action=False)
+    fitness, lenghts = run_simulation(models, "LunarLander-v3", 1214, repetitions=10, batch_size=100)
     end_time = time.time()
 
     print(f"Execution time: {end_time - start_time} seconds")
@@ -83,3 +94,8 @@ if __name__ == "__main__":
     print(fitness, lenghts)
     print(fitness.shape, lenghts.shape)
 
+    model = RandomModel()
+    
+    fitness, lenght = run_simulation([model], "LunarLander-v3", 1000, 1, render=True, show_observation=True, show_action=True)
+
+    print(fitness, lenght)
