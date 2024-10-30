@@ -2,7 +2,7 @@ import itertools
 import gymnasium as gym
 from tqdm import tqdm
 import numpy as np
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from models import Model
 
 def run_once(model: Model, env: gym.Env, max_steps: int, show_observation: bool, show_action: bool):    
@@ -30,15 +30,17 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int, show_observation: 
     fitness = 0.0
 
     for i in range(max_steps):
-        action = model.make_decision(observation)
-        observation, reward, terminated, truncated, _ = env.step(action)
+        observation, reward, terminated, truncated, _ = env.step(model.make_decision(observation))
 
-        fitness += float(reward)
+        fitness += reward # type: ignore
 
         if terminated or truncated:
             return fitness, i+1
         
     return fitness, max_steps
+
+def run_once_thin_wrapper(args):
+    return run_once_thin(*args)
 
 def run_simulation(models: list[Model], 
                    env: str, 
@@ -59,8 +61,8 @@ def run_simulation(models: list[Model],
         for model in itertools.islice(itertools.cycle(models), repetitions*len(models))
     ] 
 
-    with ThreadPoolExecutor() as executor:
-        results = list(tqdm(executor.map(lambda args: run_once_thin(*args), tasks), total=len(tasks)))
+    with ProcessPoolExecutor() as executor:
+        results = list(tqdm(executor.map(run_once_thin_wrapper, tasks), total=len(tasks)))
         fitnesses, lengths = zip(*results)
         return np.array(fitnesses).reshape(repetitions, len(models)), np.array(lengths).reshape(repetitions, len(models))
 
@@ -68,7 +70,7 @@ def run_simulation(models: list[Model],
 if __name__ == "__main__":
     from models import RandomModel
 
-    models = [RandomModel() for _ in range(5)] # type: list[Model]
+    models = [RandomModel() for _ in range(50)] # type: list[Model]
 
     fitness, lenghts = run_simulation(models, "BipedalWalker-v3", 300, repetitions=10, render=False, show_observation=False, show_action=False)
 
