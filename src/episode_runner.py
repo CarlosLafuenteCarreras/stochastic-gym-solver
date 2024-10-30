@@ -1,6 +1,7 @@
-from stochastic import Model
 import gymnasium as gym
 from tqdm import tqdm
+
+from models import Model
 
 def run_simulation(model: Model, 
                    env: gym.Env, 
