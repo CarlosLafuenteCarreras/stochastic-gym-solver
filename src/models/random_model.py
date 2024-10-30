@@ -1,9 +1,5 @@
-
-
-
 import numpy as np
-from models import Model
-
+from .base import Model
 
 class RandomModel(Model):   
     def make_decision(self, observation: np.ndarray) -> np.ndarray:

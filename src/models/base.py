@@ -1,10 +1,6 @@
 import numpy as np
-from .base import Model
 
-class NeuralNetworkModel(Model):
-    def __init__(self, input_size: int, hidden_layers: list):
-        pass
-
+class Model:
     def make_decision(self, observation: np.ndarray) -> np.ndarray:
         raise NotImplementedError()
     
@@ -13,3 +9,4 @@ class NeuralNetworkModel(Model):
     
     def set_parameters(self, parameters: dict):
         raise NotImplementedError()
+
