@@ -90,16 +90,16 @@ def run_simulation(models: list[Model]|Model,
 if __name__ == "__main__":
     from models import RandomModel
     import time
-    models = [RandomModel() for _ in range(5000)] # type: list[Model]
+    models = [RandomModel() for _ in range(500)] # type: list[Model]
 
     start_time = time.time()
-    fitness, lenghts = run_simulation(models, "LunarLander-v3", 150, repetitions=50, batch_size=100)
+    fitness, lenghts = run_simulation(models, "LunarLander-v3", 150, repetitions=100, batch_size=50)
     end_time = time.time()
 
     print(f"Execution time: {end_time - start_time} seconds")
 
     print(fitness, lenghts)
-    print(fitness.shape, lenghts.shape)
+    print(np.mean(fitness), np.mean(lenghts))
 
     # model = RandomModel()
     # fitness, lenght = run_simulation([model], "LunarLander-v3", 1000, 1, render=True, show_observation=True, show_action=True)
