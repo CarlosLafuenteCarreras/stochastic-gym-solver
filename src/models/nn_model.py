@@ -7,7 +7,7 @@ class NeuralNetworkModel(Model, nn.Module):
     def __init__(self, input_size: int, output_size: int, hidden_layers: list = None):
         super(NeuralNetworkModel, self).__init__()
 
-        # List of layers.
+        # List of layers and actions functions.
         if hidden_layers is None:
             layers = [nn.Linear(input_size, output_size)]
             act_funcs = [nn.Sigmoid()]
@@ -60,7 +60,7 @@ class NeuralNetworkModel(Model, nn.Module):
         return [elem for row in parameters for elem in row]  # Flatten the list.
 
 
-    def set_parameters(self, flat_params):
+    def set_parameters(self, flat_params: list | np.ndarray | torch.Tensor) -> None:
         """
         Takes a one-dimensional / flat list and uses it to assign the parameters of the NN.
 
@@ -95,9 +95,9 @@ if __name__ == "__main__":
     model = NeuralNetworkModel(2, 1)
     flat = model.get_parameters()
     new = np.random.random(len(flat))
-    print(flat)
-    print(new)
+    print("flattened old: ", flat)
+    print("new random values: ", new)
     model.set_parameters(new)
-    print(model.get_parameters())
+    print("test of new params", model.get_parameters())
     pass
 
