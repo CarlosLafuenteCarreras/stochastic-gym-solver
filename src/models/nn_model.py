@@ -4,61 +4,100 @@ import torch
 import torch.nn as nn
 
 class NeuralNetworkModel(Model, nn.Module):
-    def __init__(self, input_size: int, hidden_layers: list, output_size: int):
+    def __init__(self, input_size: int, output_size: int, hidden_layers: list = None):
         super(NeuralNetworkModel, self).__init__()
 
-        layers = ([nn.Linear(input_size, hidden_layers[0])] # List of layers.
-                  +[nn.Linear(hidden_layers[i], hidden_layers[i+1]) for i in range(len(hidden_layers)-1)]
-                  +[nn.Linear(hidden_layers[-1], output_size)])
-        act_funcs = [nn.ReLU()] * len(hidden_layers) + [nn.Sigmoid()] # List of activation functions.
+        # List of layers.
+        if hidden_layers is None:
+            layers = [nn.Linear(input_size, output_size)]
+            act_funcs = [nn.Sigmoid()]
+        else:
+            layers = ([nn.Linear(input_size, hidden_layers[0])]
+                      +[nn.Linear(hidden_layers[i], hidden_layers[i+1]) for i in range(len(hidden_layers)-1)]
+                      +[nn.Linear(hidden_layers[-1], output_size)])
+            act_funcs = [nn.ReLU()] * len(hidden_layers) + [nn.Sigmoid()] # List of activation functions.
 
         zipped = [elem for pair in zip(layers, act_funcs) for elem in pair] # Creates list with all layers and activation functions.
 
         self.linear = nn.Sequential(*zipped)
 
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of the neural network.
+        :param x: Input to the neural network in the form of a torch.Tensor.
+        :return: Output of the neural network in the form of a torch.Tensor.
+        """
+        return self.linear(x)
 
     def make_decision(self, observation: np.ndarray) -> np.ndarray:
-        raise NotImplementedError()
+        """
+        Main decision-making function of the neural network.
+        :param observation: np.ndarray as input vector representing the observation state.
+        :return: np.ndarray as output vector representing the decision.
+        """
+
+        # Creates torch.Tensor from passed np.ndarray.
+        observation_tensor = torch.tensor(observation, dtype=torch.float32)
+
+        output = self.forward(observation_tensor)
+        return output.detach().numpy()
     
-    def get_parameters(self) -> dict:
+    def get_parameters_dict(self) -> dict:
         parameters = {}
         for name, param in self.linear.named_parameters():
             parameters[name] = param.detach().numpy()  # Detach and convert to NumPy array
         return parameters
 
-    def get_parametes_Iterator(self):
-        return self.linear.parameters() # coutputs Iterator[Parameter]
+    def get_parameters_iterator(self):
+        return self.linear.parameters() # outputs Iterator[Parameter]
 
-    def flatten_parameters(self):
+    def get_parameters(self) -> list:
         """
-        Nimmt ein PyTorch-Modell und gibt alle Parameter als 1-dimensionalen Array zurück.
+        Returns all parameters of the NN model as one flattened list.
+        :return: Flattened list of all parameters of the NN model.
         """
-        parameters = [param.data.view(-1) for param in self.linear.parameters()]
-        return torch.cat(parameters)
+        parameters = [param.data.view(-1).tolist() for param in self.linear.parameters()] # Create list of the parameters.
+        return [elem for row in parameters for elem in row]  # Flatten the list.
 
-    def assign_parameters(self, flat_params):
+
+    def set_parameters(self, flat_params):
         """
-        Nimmt einen 1-dimensionalen Array und überschreibt damit die Parameter im Modell.
+        Takes a one-dimensional / flat list and uses it to assign the parameters of the NN.
+
+        :param flat_params: Flat list of parameters of the NN model. Must have same size as the list gotten with 'self.flatten_parameters()'.
+        :return: None
         """
+
+        # Converting flat_params to type torch.tensor
+        if type(flat_params) is np.ndarray:
+            flat_params = torch.from_numpy(flat_params)
+        elif type(flat_params) is list:
+            flat_params = torch.tensor(flat_params)
+
+        # Making sure that parameter flat_params has the correct length.
+        total_numel = sum(param.numel() for param in self.linear.parameters())
+        if len(flat_params) != total_numel:
+            raise ValueError(f"Parameter flat_params must be of correct length. Should be of length {total_numel} in this case.")
+
+        # Assign the parameters.
         current_position = 0
         for param in self.linear.parameters():
-            # Bestimme die Anzahl der Datenpunkte in den Parametern
+            # Determine number of data points in the parameters.
             param_size = param.numel()
-            # Erhalte den entsprechenden Abschnitt des Arrays
+            # Saves corresponding section of array.
             param.data.copy_(flat_params[current_position:current_position + param_size].view_as(param))
-            # Update die aktuelle Position
+            # Update current position.
             current_position += param_size
-    
-    def set_parameters(self, parameters: dict):
-        self.linear.
-        raise NotImplementedError()
+
 
 
 if __name__ == "__main__":
-    model = NeuralNetworkModel(2, [3], 1)
-    print("model ", model)
-    print()
-    print("model.linear.params ", list(model.linear.parameters()))#
-    print()
-    print("model.get_params ", model.get_parameters())
+    model = NeuralNetworkModel(2, 1)
+    flat = model.get_parameters()
+    new = np.random.random(len(flat))
+    print(flat)
+    print(new)
+    model.set_parameters(new)
+    print(model.get_parameters())
+    pass
 
