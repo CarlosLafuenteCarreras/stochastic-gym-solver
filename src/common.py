@@ -1,10 +1,8 @@
 from argparse import Namespace
 import datetime
 import os
-from torch.utils.tensorboard.writer import SummaryWriter
-
+from tensorboardX import SummaryWriter
 import config
-
 
 def splash_screen(params: Namespace):
     print(r"""

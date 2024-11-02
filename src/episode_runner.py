@@ -2,7 +2,7 @@ import itertools
 import gymnasium as gym
 from tqdm import tqdm
 import numpy as np
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from models import Model
 
 def run_once(model: Model, env: gym.Env, max_steps: int, show_observation: bool, show_action: bool):    
@@ -48,6 +48,9 @@ def run_batch(args):
     return [run_once_thin(model, env, max_steps) for _ in range(batch_size)]
 
 
+# create executor
+executor = ThreadPoolExecutor(max_workers=16)
+
 def run_simulation(models: list[Model]|Model, 
                    env: str|tuple[str, dict],
                    max_steps: int, 
@@ -56,7 +59,9 @@ def run_simulation(models: list[Model]|Model,
                    render: bool = False, 
                    show_observation: bool = False, 
                    show_action: bool = False,
+                   progress_bar: bool = True,
                    ) -> tuple[np.ndarray, np.ndarray]:
+    global executor
     if not isinstance(models, list):
         models = [models]
         
@@ -81,10 +86,11 @@ def run_simulation(models: list[Model]|Model,
         for model in itertools.islice(itertools.cycle(models), batches)
     ]
 
-    with ProcessPoolExecutor() as executor:
-        results = tqdm(executor.map(run_batch, tasks), total=batches)
-        fitnesses, lengths = zip(*itertools.chain.from_iterable(results))
-        return np.array(fitnesses).reshape(repetitions, len(models)), np.array(lengths).reshape(repetitions, len(models))
+    print(f"Running {batches} batches of {batch_size} simulations each")
+
+    results = tqdm(executor.map(run_batch, tasks), total=batches, disable=not progress_bar)
+    fitnesses, lengths = zip(*itertools.chain.from_iterable(results))
+    return np.array(fitnesses).reshape(repetitions, len(models)), np.array(lengths).reshape(repetitions, len(models))
 
 
 if __name__ == "__main__":
