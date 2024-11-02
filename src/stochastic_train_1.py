@@ -1,7 +1,7 @@
 import numpy as np
 import argparse
 import gymnasium as gym
-import tensorboard
+import tensorboardX
 from git.repo import Repo
 import tqdm
 
@@ -32,8 +32,8 @@ def run():
     params.output_size = env.action_space.shape[0] # type: ignore
     params.hidden_layers = [64, 64]
 
-    params.batch_size = 50
-    params.repetitions = 1000
+    params.batch_size = 5
+    params.repetitions = 10
     params.max_steps = 150
 
     params.episodes = 10000

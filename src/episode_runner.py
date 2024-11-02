@@ -49,7 +49,7 @@ def run_batch(args):
 
 
 # create executor
-executor = ThreadPoolExecutor(max_workers=16)
+executor = ProcessPoolExecutor(max_workers=32)
 
 def run_simulation(models: list[Model]|Model, 
                    env: str|tuple[str, dict],
@@ -85,8 +85,6 @@ def run_simulation(models: list[Model]|Model,
         (model, gym.make(env, **env_options), max_steps, batch_size)
         for model in itertools.islice(itertools.cycle(models), batches)
     ]
-
-    print(f"Running {batches} batches of {batch_size} simulations each")
 
     results = tqdm(executor.map(run_batch, tasks), total=batches, disable=not progress_bar)
     fitnesses, lengths = zip(*itertools.chain.from_iterable(results))
