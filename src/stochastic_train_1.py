@@ -37,6 +37,19 @@ network = NeuralNetworkModel(params.input_size, params.output_size, params.hidde
 
 logger = splash_screen(params)
 
+# logger.add_hparams(
+#     hparam_dict={
+#         "learning_rate": params.learning_rate,
+#     },
+#     metric_dict={
+#         "fitness": 0.0,
+#         "max_fitness": 0.0,
+#         "steps": 0,
+#     },
+# )
+
+logger.flush()
+
 def run():
     pass
 
