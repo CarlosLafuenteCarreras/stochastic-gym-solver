@@ -1,10 +1,10 @@
 import numpy as np
-from base import Model
+from .base import Model
 import torch
 import torch.nn as nn
 
 class NeuralNetworkModel(Model, nn.Module):
-    def __init__(self, input_size: int, output_size: int, hidden_layers: list = None):
+    def __init__(self, input_size: int, output_size: int, hidden_layers: list|None = None):
         super(NeuralNetworkModel, self).__init__()
 
         # List of layers and actions functions.
@@ -85,7 +85,7 @@ class NeuralNetworkModel(Model, nn.Module):
             # Determine number of data points in the parameters.
             param_size = param.numel()
             # Saves corresponding section of array.
-            param.data.copy_(flat_params[current_position:current_position + param_size].view_as(param))
+            param.data.copy_(flat_params[current_position:current_position + param_size].view_as(param)) # type: ignore
             # Update current position.
             current_position += param_size
 
@@ -99,5 +99,4 @@ if __name__ == "__main__":
     print("new random values: ", new)
     model.set_parameters(new)
     print("test of new params", model.get_parameters())
-    pass
 

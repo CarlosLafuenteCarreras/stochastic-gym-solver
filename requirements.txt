@@ -1,5 +1,4 @@
 gymnasium==1.0.0
-numba==0.60.0
-numpy==2.1.2
-torch==2.5.0+cu124
+torch==2.5.0
+numpy==2.0.2
 tqdm==4.66.5
