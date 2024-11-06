@@ -45,18 +45,6 @@ def run():
 
     logger = splash_screen(params)
 
-    # logger.add_hparams(
-    #     hparam_dict={
-    #         "learning_rate": params.learning_rate,
-    #         "hidden_layers": str(params.hidden_layers),
-    #     },
-    #     metric_dict={
-    #         "fitness": 0.0,
-    #         "max_fitness": 0.0,
-    #         "steps": 0,
-    #     },
-    # )
-
     logger.flush()
 
 
@@ -78,7 +66,14 @@ def run():
         return fitness.mean(axis=0)
     
     for i in tqdm.trange(params.episodes):
-        fitness = fitness_function([NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)], i)
+
+        w_tries = sample_distribution(model)
+
+        fitness = fitness_function(w_tries, i)
+        
+        optimize(w_tries, fitness, params.learning_rate)
+
+        
         logger.add_scalar("fitness", fitness, i)
         logger.flush()
         
