@@ -41,6 +41,7 @@ def run():
 
     # hiperparameters
     params.learning_rate = 0.01
+    params.sigma = 0.01
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
 
@@ -67,12 +68,12 @@ def run():
         return fitness.mean(axis=0)
     
     for i in tqdm.trange(params.episodes):
-
         w_tries = sample_distribution(w, params.sigma)
 
         fitness = fitness_function(w_tries, i)
         
-        w = NES(w_tries, fitness, params.learning_rate)
+        theta = NES(w_tries, fitness, params.learning_rate, w.get_parameters())
+        w.set_parameters(theta)
         
         logger.add_scalar("fitness", fitness, i)
         logger.flush()
