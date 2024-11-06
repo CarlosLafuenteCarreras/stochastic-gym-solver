@@ -67,14 +67,16 @@ def sample_distribution(model: NeuralNetworkModel, sigma: float, npop: int) -> l
   return [model.new_from_parameters(p(w.shape, sigma, w)) for _ in range(npop)]
 
 
-def NES(samples:np.ndarray, fitness:np.ndarray, learning_rate:float, theta: np.ndarray, npop:int, sigma:float) -> np.ndarray:
+def NES(samples:list, fitness:np.ndarray, learning_rate:float, theta: np.ndarray, npop:int, sigma:float) -> np.ndarray:
   # samples = p(solution)  # TODO: add distribution parameters
   # models = params_to_model(samples)
 
   # fitness = np.array([f(sample) for sample in samples])
 
+  samples = np.array([sample.get_parameters() for sample in samples])
+
   alpha = learning_rate / (npop * sigma)
-  F_inverse = samples.T
+  F_inverse = samples.transpose()
   gradient = (fitness - np.mean(fitness)) / np.std(fitness)
 
   d_theta = alpha * F_inverse @ gradient

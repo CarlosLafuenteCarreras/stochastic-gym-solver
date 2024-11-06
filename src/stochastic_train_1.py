@@ -31,18 +31,18 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] # type: ignore
-    params.hidden_layers = [64, 64]
+    params.hidden_layers = [4, 4] # [64, 64]
 
     params.batch_size = 5
     params.repetitions = 10
     params.max_steps = 150
 
-    params.episodes = 10000
+    params.episodes = 100 # 10000
 
     # hiperparameters
     params.learning_rate = 0.01
-    params.sigma = 0.01
-    params.npop = 50
+    params.sigma = 0.1 # 0.01
+    params.npop = 10 # 50
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
 
@@ -76,7 +76,7 @@ def run():
         theta = NES(w_tries, fitness, params.learning_rate, w.get_parameters(), params.npop, params.sigma)
         w.set_parameters(theta)
         
-        logger.add_scalar("fitness", fitness, i)
+       # logger.add_scalar("fitness", fitness, i)
         logger.flush()
         
 
