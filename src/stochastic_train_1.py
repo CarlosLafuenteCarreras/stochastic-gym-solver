@@ -41,9 +41,9 @@ def run():
     params.episodes = 50_000 # 10000
 
     # hiperparameters
-    params.learning_rate = 0.1
-    params.sigma = 0.5 # 0.01
-    params.npop = 20 # 50
+    params.learning_rate = 0.05
+    params.sigma = 0.25 # 0.01
+    params.npop = 50 # 50
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
 
@@ -103,9 +103,8 @@ def run():
 
             torch.save(w.state_dict(), descrp)
 
-        if i > 500:
+        if i > 300:
             params.max_steps = 180
-
 
         logger.flush()
         
