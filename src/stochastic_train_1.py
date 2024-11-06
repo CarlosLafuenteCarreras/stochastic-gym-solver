@@ -68,7 +68,7 @@ def run():
     
     for i in tqdm.trange(params.episodes):
 
-        w_tries = sample_distribution(model)
+        w_tries = sample_distribution(w, params.sigma)
 
         fitness = fitness_function(w_tries, i)
         

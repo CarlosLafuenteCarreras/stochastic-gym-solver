@@ -7,6 +7,10 @@ class NeuralNetworkModel(Model, nn.Module):
     def __init__(self, input_size: int, output_size: int, hidden_layers: list|None = None):
         super(NeuralNetworkModel, self).__init__()
 
+        self.input_size = input_size
+        self.output_size = output_size
+        self.hidden_layers = hidden_layers
+
         # List of layers and actions functions.
         if hidden_layers is None:
             layers = [nn.Linear(input_size, output_size)]
@@ -20,6 +24,19 @@ class NeuralNetworkModel(Model, nn.Module):
         zipped = [elem for pair in zip(layers, act_funcs) for elem in pair] # Creates list with all layers and activation functions.
 
         self.linear = nn.Sequential(*zipped)
+
+    def new_from_parameters(self, parameters: np.ndarray) -> 'NeuralNetworkModel':
+        """
+        Creates a new instance of the NeuralNetworkModel class from a list
+        of parameters.
+
+        :param parameters: List of parameters to create the new instance from.
+        :return: New instance of the NeuralNetworkModel class.
+        """
+        model = NeuralNetworkModel(self.input_size, self.output_size, self.hidden_layers)
+        model.set_parameters(parameters)
+
+        return model
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -51,13 +68,13 @@ class NeuralNetworkModel(Model, nn.Module):
     def get_parameters_iterator(self):
         return self.linear.parameters() # outputs Iterator[Parameter]
 
-    def get_parameters(self) -> list:
+    def get_parameters(self) -> np.ndarray:
         """
         Returns all parameters of the NN model as one flattened list.
         :return: Flattened list of all parameters of the NN model.
         """
         parameters = [param.data.view(-1).tolist() for param in self.linear.parameters()] # Create list of the parameters.
-        return [elem for row in parameters for elem in row]  # Flatten the list.
+        return np.array([elem for row in parameters for elem in row])  # Flatten the list.
 
 
     def set_parameters(self, flat_params: list | np.ndarray | torch.Tensor) -> None:
