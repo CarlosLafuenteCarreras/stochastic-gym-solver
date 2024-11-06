@@ -3,9 +3,10 @@ import argparse
 import gymnasium as gym
 import tensorboardX
 from git.repo import Repo
+import torch
 import tqdm
 
-from common import splash_screen
+from common import get_file_descriptor, splash_screen
 from episode_runner import run_simulation
 from models.nn_model import NeuralNetworkModel
 from solver.nes_demo import NES, sample_distribution
@@ -31,20 +32,23 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] # type: ignore
-    params.hidden_layers = [64, 32] # [64, 64]
+    params.hidden_layers = [64, 64] # [64, 64]
 
     params.batch_size = 5
-    params.repetitions = 20
-    params.max_steps = 150
+    params.repetitions = 5
+    params.max_steps = 130
 
-    params.episodes = 1000 # 10000
+    params.episodes = 50_000 # 10000
 
     # hiperparameters
     params.learning_rate = 0.1
     params.sigma = 0.5 # 0.01
-    params.npop = 10 # 50
+    params.npop = 20 # 50
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
+
+    if params.resume:
+        w.load_state_dict(torch.load(params.resume))
 
     population = [w.new_from_parameters(w.get_parameters()) for _ in range(params.npop)]
 
@@ -92,6 +96,17 @@ def run():
             
             episodes.set_description(f"Fitness: {reference_fitness.mean():.2f}")
             logger.add_scalar("reference_fitness", reference_fitness.mean(), i)
+
+        if i % 100 == 0:
+            # save w to disk
+            descrp = get_file_descriptor(params, i)
+
+            torch.save(w.state_dict(), descrp)
+
+        if i > 500:
+            params.max_steps = 180
+
+
         logger.flush()
         
 

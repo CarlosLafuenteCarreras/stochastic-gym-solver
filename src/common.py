@@ -28,6 +28,6 @@ def splash_screen(params: Namespace):
     return train_summary_writer
 
 def get_file_descriptor(params: Namespace, episode: int):
-    return f"{config.MODELS_DIR}{params.env_name}{params.version}_{config.RUN_NAME}_{episode}"
+    return f"{config.MODELS_DIR}/{params.commit[:8]}{params.version}_{config.RUN_NAME}_{episode}.pth"
 
 
