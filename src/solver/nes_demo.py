@@ -57,6 +57,8 @@ def params_to_model():
   """
   raise NotImplementedError
 
+def sample_distribution(model):
+  pass
 
 def NES(samples, fitness, learning_rate):
   samples = p(solution)  # TODO: add distribution parameters

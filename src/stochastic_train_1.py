@@ -8,6 +8,7 @@ import tqdm
 from common import splash_screen
 from episode_runner import run_simulation
 from models.nn_model import NeuralNetworkModel
+from solver.nes_demo import NES, sample_distribution
 
 
 def run():
@@ -71,7 +72,7 @@ def run():
 
         fitness = fitness_function(w_tries, i)
         
-        w = nes(w_tries, fitness, params.learning_rate)
+        w = NES(w_tries, fitness, params.learning_rate)
         
         logger.add_scalar("fitness", fitness, i)
         logger.flush()
