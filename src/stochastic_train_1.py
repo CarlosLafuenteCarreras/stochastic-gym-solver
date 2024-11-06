@@ -71,8 +71,7 @@ def run():
 
         fitness = fitness_function(w_tries, i)
         
-        optimize(w_tries, fitness, params.learning_rate)
-
+        w = nes(w_tries, fitness, params.learning_rate)
         
         logger.add_scalar("fitness", fitness, i)
         logger.flush()
