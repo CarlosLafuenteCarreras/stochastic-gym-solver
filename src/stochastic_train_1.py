@@ -41,7 +41,7 @@ def run():
     # hiperparameters
     params.learning_rate = 0.01
 
-    # network = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
+    w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
 
     logger = splash_screen(params)
 
