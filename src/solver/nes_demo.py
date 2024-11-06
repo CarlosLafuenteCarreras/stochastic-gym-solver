@@ -1,4 +1,5 @@
 import numpy as np
+from models.nn_model import NeuralNetworkModel
 np.random.seed(0)
 
 # the function we want to optimize
@@ -33,15 +34,14 @@ for i in range(300):
 
 ## Dareks idea
 
-def p(size=(npop, 3)):
+def p(size: tuple, sigma: float, params: np.ndarray):
   """
   Generates samples from distribution
 
   :param size: tuple representing the size of the samples
   :return:
   """
-  # TODO: implement probability distribution.
-  return np.random.randn(*size)
+  return params + np.random.randn(*size)*sigma
 
 def gradient():
   raise NotImplementedError
@@ -57,9 +57,15 @@ def params_to_model():
   raise NotImplementedError
 
 
-def NES(samples, fitness, learning_rate, theta: np.ndarray) -> np.ndarray:
-  #samples = p(solution)  # TODO: add distribution parameters
-  #models = params_to_model(samples)
+def sample_distribution(model: NeuralNetworkModel, sigma: float) -> list[NeuralNetworkModel]:
+  w = model.get_parameters()
+
+  return [model.new_from_parameters(p(w.shape, sigma, w)) for _ in range(npop)]
+
+
+def NES(samples, fitness, learning_rate, theta: np.ndarray) -> NeuralNetworkModel:
+  # samples = p(solution)  # TODO: add distribution parameters
+  # models = params_to_model(samples)
 
   #fitness = np.array([f(sample) for sample in samples])
 
