@@ -31,7 +31,7 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] # type: ignore
-    params.hidden_layers = [10, 10] # [64, 64]
+    params.hidden_layers = [64, 32] # [64, 64]
 
     params.batch_size = 5
     params.repetitions = 10
@@ -40,9 +40,9 @@ def run():
     params.episodes = 1000 # 10000
 
     # hiperparameters
-    params.learning_rate = 0.001
-    params.sigma = 0.2 # 0.01
-    params.npop = 150 # 50
+    params.learning_rate = 0.05
+    params.sigma = 0.5 # 0.01
+    params.npop = 30 # 50
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
 
