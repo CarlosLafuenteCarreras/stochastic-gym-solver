@@ -34,15 +34,15 @@ def run():
     params.hidden_layers = [64, 32] # [64, 64]
 
     params.batch_size = 5
-    params.repetitions = 10
+    params.repetitions = 20
     params.max_steps = 150
 
     params.episodes = 1000 # 10000
 
     # hiperparameters
-    params.learning_rate = 0.05
+    params.learning_rate = 0.1
     params.sigma = 0.5 # 0.01
-    params.npop = 30 # 50
+    params.npop = 10 # 50
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
 
@@ -82,7 +82,16 @@ def run():
         w.set_parameters(theta)
 
         if i % 10 == 0:
-            episodes.set_description(f"Fitness: {fitness.mean():.2f}")
+            reference_fitness, _ = run_simulation([w], # type: ignore
+                                        params.env, 
+                                        params.max_steps, 
+                                        repetitions=100, 
+                                        batch_size=10,
+                                        progress_bar=False,
+                                    )
+            
+            episodes.set_description(f"Fitness: {reference_fitness.mean():.2f}")
+            logger.add_scalar("reference_fitness", reference_fitness.mean(), i)
         logger.flush()
         
 
