@@ -31,20 +31,22 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] # type: ignore
-    params.hidden_layers = [4, 4] # [64, 64]
+    params.hidden_layers = [64, 64] # [64, 64]
 
     params.batch_size = 5
     params.repetitions = 10
     params.max_steps = 150
 
-    params.episodes = 100 # 10000
+    params.episodes = 1000 # 10000
 
     # hiperparameters
-    params.learning_rate = 0.01
-    params.sigma = 0.1 # 0.01
-    params.npop = 10 # 50
+    params.learning_rate = 0.001
+    params.sigma = 0.05 # 0.01
+    params.npop = 50 # 50
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
+
+    population = [w.new_from_parameters(w.get_parameters()) for _ in range(params.npop)]
 
     logger = splash_screen(params)
 
@@ -69,11 +71,11 @@ def run():
         return fitness.mean(axis=0)
     
     for i in tqdm.trange(params.episodes):
-        w_tries = sample_distribution(w, params.sigma, params.npop)
+        w_tries_numpy = sample_distribution(w, population, params.sigma, params.npop)
 
-        fitness = fitness_function(w_tries, i)
+        fitness = fitness_function(population, i)
         
-        theta = NES(w_tries, fitness, params.learning_rate, w.get_parameters(), params.npop, params.sigma)
+        theta = NES(w_tries_numpy, fitness, params.learning_rate, w.get_parameters(), params.npop, params.sigma)
         w.set_parameters(theta)
         
        # logger.add_scalar("fitness", fitness, i)

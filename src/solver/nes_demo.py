@@ -1,6 +1,7 @@
+from typing import Tuple
 import numpy as np
 
-from src.models import NeuralNetworkModel
+from models import NeuralNetworkModel
 
 
 # from models.nn_model import NeuralNetworkModel
@@ -61,19 +62,25 @@ def params_to_model():
   raise NotImplementedError
 
 
-def sample_distribution(model: NeuralNetworkModel, sigma: float, npop: int) -> list[NeuralNetworkModel]:
+def sample_distribution(model: NeuralNetworkModel, population: list[NeuralNetworkModel], sigma: float, npop: int) -> np.ndarray:
   w = model.get_parameters()
 
-  return [model.new_from_parameters(p(w.shape, sigma, w)) for _ in range(npop)]
+  samples = np.array([p(w.shape, sigma, w) for _ in range(npop)])
+
+  for i in range(npop):
+    population[i].set_parameters(samples[i])
+
+  return samples
 
 
-def NES(samples:list, fitness:np.ndarray, learning_rate:float, theta: np.ndarray, npop:int, sigma:float) -> np.ndarray:
+  
+
+
+def NES(samples: np.ndarray, fitness:np.ndarray, learning_rate:float, theta: np.ndarray, npop:int, sigma:float) -> np.ndarray:
   # samples = p(solution)  # TODO: add distribution parameters
   # models = params_to_model(samples)
 
   # fitness = np.array([f(sample) for sample in samples])
-
-  samples = np.array([sample.get_parameters() for sample in samples])
 
   alpha = learning_rate / (npop * sigma)
   F_inverse = samples.transpose()
