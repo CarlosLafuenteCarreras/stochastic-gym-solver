@@ -4,8 +4,8 @@ import numpy as np
 from models import NeuralNetworkModel
 
 
-# from models.nn_model import NeuralNetworkModel
-# np.random.seed(0)
+from models.nn_model import NeuralNetworkModel
+np.random.seed(0)
 
 # # the function we want to optimize
 # def f(w):
@@ -86,14 +86,9 @@ def NES(samples: np.ndarray, fitness:np.ndarray, learning_rate:float, theta: np.
   F_inverse = samples.transpose()
   gradient = (fitness - np.mean(fitness)) / np.std(fitness)
 
-  d_theta = alpha * F_inverse @ gradient
+  d_theta = alpha * np.dot(F_inverse, gradient)
   theta += d_theta
 
   return theta
-
-
-  #  A = (R - np.mean(R)) / np.std(R)
-  #  w = w + alpha / (npop * sigma) * np.dot(N.T, A)
-
 
 

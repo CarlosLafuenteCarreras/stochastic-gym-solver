@@ -69,16 +69,20 @@ def run():
         logger.add_scalar("steps_mean", lenghts.mean(), i)
 
         return fitness.mean(axis=0)
+
+
+    episodes = tqdm.trange(params.episodes)
     
-    for i in tqdm.trange(params.episodes):
+    for i in episodes:
         w_tries_numpy = sample_distribution(w, population, params.sigma, params.npop)
 
         fitness = fitness_function(population, i)
         
         theta = NES(w_tries_numpy, fitness, params.learning_rate, w.get_parameters(), params.npop, params.sigma)
         w.set_parameters(theta)
-        
-       # logger.add_scalar("fitness", fitness, i)
+
+        if i % 10 == 0:
+            episodes.set_description(f"Fitness: {fitness.mean():.2f}")
         logger.flush()
         
 
