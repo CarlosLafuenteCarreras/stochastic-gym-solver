@@ -24,7 +24,6 @@ for i in range(300):
     w_try = w + sigma*N[j]
     R[j] = f(w_try)
 
-
   # Should be faster than for loop
   R2 = np.array([f(w + sigma *N_i) for N_i in N])
 
@@ -58,17 +57,24 @@ def params_to_model():
   raise NotImplementedError
 
 
-def NES(samples, fitness, learning_rate):
-  samples = p(solution)  # TODO: add distribution parameters
-  models = params_to_model(samples)
+def NES(samples, fitness, learning_rate, theta: np.ndarray) -> np.ndarray:
+  #samples = p(solution)  # TODO: add distribution parameters
+  #models = params_to_model(samples)
 
-  fitness = np.array([f(sample) for sample in samples])
+  #fitness = np.array([f(sample) for sample in samples])
+
+  alpha = learning_rate / (npop * sigma)
+  F_inverse = samples.T
+  gradient = (fitness - np.mean(fitness)) / np.std(fitness)
 
   d_theta = alpha * F_inverse @ gradient
   theta += d_theta
 
-  A = (R - np.mean(R)) / np.std(R)
-  w = w + alpha / (npop * sigma) * np.dot(N.T, A)
+  return theta
+
+
+  #  A = (R - np.mean(R)) / np.std(R)
+  #  w = w + alpha / (npop * sigma) * np.dot(N.T, A)
 
 for i in range(300):# Printing for debugging
   if i % 20 == 0:
