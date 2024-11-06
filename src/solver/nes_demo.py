@@ -1,5 +1,5 @@
 import numpy as np
-from models.nn_model import NeuralNetworkModel
+from src.models.nn_model import NeuralNetworkModel
 np.random.seed(0)
 
 # the function we want to optimize
