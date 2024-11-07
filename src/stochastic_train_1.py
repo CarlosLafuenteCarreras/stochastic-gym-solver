@@ -32,7 +32,7 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] # type: ignore
-    params.hidden_layers = [64, 64] # [64, 64]
+    params.hidden_layers = [8, 8] # [64, 64]
 
     params.batch_size = 5
     params.repetitions = 5
@@ -41,8 +41,8 @@ def run():
     params.episodes = 50_000 # 10000
 
     # hiperparameters
-    params.learning_rate = 0.05
-    params.sigma = 0.25 # 0.01
+    params.learning_rate = 0.1
+    params.sigma = 0.5 # 0.01
     params.npop = 50 # 50
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
@@ -96,6 +96,10 @@ def run():
             
             episodes.set_description(f"Fitness: {reference_fitness.mean():.2f}")
             logger.add_scalar("reference_fitness", reference_fitness.mean(), i)
+
+            parameters = w.get_parameters()
+
+            logger.add_histogram("w_params", parameters, i)
 
         if i % 100 == 0:
             # save w to disk
