@@ -32,21 +32,21 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] # type: ignore
-    params.hidden_layers = [128, 128] # [64, 64]
+    params.hidden_layers = [64, 64, 64, 64] # [64, 64]
 
-    params.batch_size = 5
-    params.repetitions = 5
-    params.max_steps = 130
+    params.batch_size = 50
+    params.repetitions = 30
+    params.max_steps = 120
 
-    params.episodes = 50_000 # 10000
+    params.episodes = 50_000 
 
     # hiperparameters
-    params.learning_rate = 0.15
-    params.sigma = 0.5 # 0.01
-    params.npop = 15 # 50
+    params.learning_rate = 0.05
+    params.sigma = 0.5
+    params.npop = 30
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
-
+    print(w.get_parameters().shape)
     if params.resume:
         w.load_state_dict(torch.load(params.resume))
 
@@ -107,8 +107,10 @@ def run():
 
             torch.save(w.state_dict(), descrp)
 
-        if i > 300:
-            params.max_steps = 180
+        # decay for sigma
+        params.sigma *= 0.9995
+        if params.sigma < 0.05:
+            params.sigma = 0.05
 
         logger.flush()
         

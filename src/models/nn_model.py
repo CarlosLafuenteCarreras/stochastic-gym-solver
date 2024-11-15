@@ -73,9 +73,8 @@ class NeuralNetworkModel(Model, nn.Module):
         Returns all parameters of the NN model as one flattened list.
         :return: Flattened list of all parameters of the NN model.
         """
-        parameters = [param.data.view(-1).tolist() for param in self.linear.parameters()] # Create list of the parameters.
-        return np.array([elem for row in parameters for elem in row])  # Flatten the list.
-
+        parameters = [param.view(-1) for param in self.linear.parameters()]  # Flatten all parameters
+        return torch.cat(parameters).detach().cpu().numpy()  
 
     def set_parameters(self, flat_params: list | np.ndarray | torch.Tensor) -> None:
         """
