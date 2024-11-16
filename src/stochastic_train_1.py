@@ -24,26 +24,26 @@ def run():
     params = argparse.Namespace()
 
     params.__dict__.update(args.__dict__)
-    params.env = ("LunarLander-v3", dict(continuous=True))
+    params.env = ("LunarLander-v3", dict())
     params.version = "v1"
     params.commit = repo.head.commit.hexsha
 
     env = gym.make(params.env[0], **params.env[1])
 
     params.input_size = env.observation_space.shape[0] # type: ignore
-    params.output_size = env.action_space.shape[0] # type: ignore
-    params.hidden_layers = [64, 64, 64, 64] # [64, 64]
+    params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
+    params.hidden_layers = [32, 16] # [64, 64]
 
-    params.batch_size = 50
-    params.repetitions = 30
-    params.max_steps = 120
+    params.batch_size = 10
+    params.repetitions = 20
+    params.max_steps = 190
 
     params.episodes = 50_000 
 
     # hiperparameters
-    params.learning_rate = 0.05
-    params.sigma = 0.5
-    params.npop = 30
+    params.learning_rate = 0.1
+    params.sigma = 0.1
+    params.npop = 25
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
     print(w.get_parameters().shape)
@@ -66,10 +66,10 @@ def run():
                                         batch_size=params.batch_size,
                                         progress_bar=False,
                                         )
+        if i % 10 == 0:
+            logger.add_histogram("fitness_hist", fitness, i)
         
-        logger.add_histogram("fitness_hist", fitness, i)
         logger.add_scalar("fitness_mean", fitness.mean(), i)
-        logger.add_scalar("max_fitness", fitness.max(), i)
         logger.add_scalar("steps_mean", lenghts.mean(), i)
 
         return fitness.mean(axis=0)
@@ -82,20 +82,23 @@ def run():
 
         fitness = fitness_function(population, i)
         
-        theta = NES(w_tries_numpy, fitness, params.learning_rate, w.get_parameters(), params.npop, params.sigma)
+        theta, delta = NES(w_tries_numpy, fitness, params.learning_rate, w.get_parameters(), params.npop, params.sigma)
         w.set_parameters(theta)
+
 
         if i % 10 == 0:
             reference_fitness, _ = run_simulation([w], # type: ignore
                                         params.env, 
                                         params.max_steps, 
-                                        repetitions=100, 
+                                        repetitions=200, 
                                         batch_size=10,
                                         progress_bar=False,
                                     )
             
             episodes.set_description(f"Fitness: {reference_fitness.mean():.2f}")
             logger.add_scalar("reference_fitness", reference_fitness.mean(), i)
+            logger.add_histogram("w_delta", delta, i)
+
 
             parameters = w.get_parameters()
 
@@ -105,12 +108,8 @@ def run():
             # save w to disk
             descrp = get_file_descriptor(params, i)
 
-            torch.save(w.state_dict(), descrp)
+            torch.save(w.state_dict(), descrp)        
 
-        # decay for sigma
-        params.sigma *= 0.9995
-        if params.sigma < 0.05:
-            params.sigma = 0.05
 
         logger.flush()
         

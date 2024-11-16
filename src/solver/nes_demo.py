@@ -76,7 +76,7 @@ def sample_distribution(model: NeuralNetworkModel, population: list[NeuralNetwor
   
 
 
-def NES(samples: np.ndarray, fitness:np.ndarray, learning_rate:float, theta: np.ndarray, npop:int, sigma:float) -> np.ndarray:
+def NES(samples: np.ndarray, fitness:np.ndarray, learning_rate:float, theta: np.ndarray, npop:int, sigma:float) ->  Tuple[np.ndarray, np.ndarray]:
   # samples = p(solution)  # TODO: add distribution parameters
   # models = params_to_model(samples)
 
@@ -89,6 +89,6 @@ def NES(samples: np.ndarray, fitness:np.ndarray, learning_rate:float, theta: np.
   d_theta = alpha * np.dot(F_inverse, gradient)
   theta += d_theta
 
-  return theta
+  return theta, d_theta
 
 

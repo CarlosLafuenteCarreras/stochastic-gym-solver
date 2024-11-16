@@ -14,12 +14,12 @@ class NeuralNetworkModel(Model, nn.Module):
         # List of layers and actions functions.
         if hidden_layers is None:
             layers = [nn.Linear(input_size, output_size)]
-            act_funcs = [nn.Sigmoid()]
+            act_funcs = [nn.Softmax()]
         else:
             layers = ([nn.Linear(input_size, hidden_layers[0])]
                       +[nn.Linear(hidden_layers[i], hidden_layers[i+1]) for i in range(len(hidden_layers)-1)]
                       +[nn.Linear(hidden_layers[-1], output_size)])
-            act_funcs = [nn.ReLU()] * len(hidden_layers) + [nn.Sigmoid()] # List of activation functions.
+            act_funcs = [nn.LeakyReLU()] * len(hidden_layers) + [nn.Softmax(dim=-1)] # List of activation functions.
 
         zipped = [elem for pair in zip(layers, act_funcs) for elem in pair] # Creates list with all layers and activation functions.
 
@@ -57,7 +57,7 @@ class NeuralNetworkModel(Model, nn.Module):
         observation_tensor = torch.tensor(observation, dtype=torch.float32)
 
         output = self.forward(observation_tensor)
-        return output.detach().numpy()
+        return np.array(np.argmax(output.detach().numpy()))
     
     def get_parameters_dict(self) -> dict:
         parameters = {}
