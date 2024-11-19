@@ -12,6 +12,7 @@ from models.nn_model import NeuralNetworkModel
 from solver.nes_demo import NES, sample_distribution
 
 
+
 def run():
     repo = Repo(search_parent_directories=True)
 
@@ -24,15 +25,32 @@ def run():
     params = argparse.Namespace()
 
     params.__dict__.update(args.__dict__)
-    params.env = ("LunarLander-v3", dict())
+    # turn off wind, make it easier
+    params.env = ("LunarLander-v3", dict(wind_power=0.1))
     params.version = "v1"
     params.commit = repo.head.commit.hexsha
 
-    env = gym.make(params.env[0], **params.env[1])
+    
+    def make_env():
+        instance = gym.make(params.env[0], **params.env[1])
+
+        instance.unwrapped.reward_shaping = True # type: ignore
+        # reduce the penalty for crashing
+        # instance.unwrapped.crash_penalty = -10 # type: ignore
+        # # reduce initial velocity
+        # instance.unwrapped.initial_random = 0.1 # type: ignore
+        # # gravity is weaker
+        # instance.unwrapped.gravity = 5 # type: ignore
+        # wind is weaker
+        instance.unwrapped.wind_power = 0.1 # type: ignore
+        
+        return instance
+
+    env = make_env()
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
-    params.hidden_layers = [32, 16] # [64, 64]
+    params.hidden_layers = [8, 8, 4] # [64, 64]
 
     params.batch_size = 10
     params.repetitions = 20
@@ -41,9 +59,9 @@ def run():
     params.episodes = 50_000 
 
     # hiperparameters
-    params.learning_rate = 0.1
-    params.sigma = 0.1
-    params.npop = 25
+    params.learning_rate = 0.01
+    params.sigma = 0.5
+    params.npop = 50
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
     print(w.get_parameters().shape)
@@ -65,6 +83,7 @@ def run():
                                         repetitions=params.repetitions, 
                                         batch_size=params.batch_size,
                                         progress_bar=False,
+                                        make_env=make_env,
                                         )
         if i % 10 == 0:
             logger.add_histogram("fitness_hist", fitness, i)
@@ -93,6 +112,7 @@ def run():
                                         repetitions=200, 
                                         batch_size=10,
                                         progress_bar=False,
+                                        make_env=make_env,
                                     )
             
             episodes.set_description(f"Fitness: {reference_fitness.mean():.2f}")
@@ -108,8 +128,19 @@ def run():
             # save w to disk
             descrp = get_file_descriptor(params, i)
 
-            torch.save(w.state_dict(), descrp)        
+            torch.save(w.state_dict(), descrp)
 
+        params.sigma *= 0.999
+
+        if params.sigma < 0.1:
+            params.sigma = 0.1
+
+        params.learning_rate *= 0.999
+
+        if params.learning_rate < 0.01:
+            params.learning_rate = 0.01
+
+        logger.add_scalar("sigma", params.sigma, i)
 
         logger.flush()
         

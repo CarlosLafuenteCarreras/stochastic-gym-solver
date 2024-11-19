@@ -1,4 +1,5 @@
 import itertools
+from typing import Callable
 import gymnasium as gym
 from tqdm import tqdm
 import numpy as np
@@ -30,9 +31,14 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
     fitness = 0.0
 
     for i in range(max_steps):
-        observation, reward, terminated, truncated, _ = env.step(model.make_decision(observation))
+        observation, reward, terminated, truncated, done = env.step(model.make_decision(observation))
+        if reward < 0.0 and reward > -5.0:
+            reward = 0
+        
+        if reward <= -100:
+            reward = -10
 
-        fitness += reward # type: ignore
+        fitness += reward
 
         if terminated or truncated:
             return fitness, i+1
@@ -60,6 +66,7 @@ def run_simulation(models: list[Model]|Model,
                    show_observation: bool = False, 
                    show_action: bool = False,
                    progress_bar: bool = True,
+                   make_env:  Callable[[], gym.Env] | None = None,
                    ) -> tuple[np.ndarray, np.ndarray]:
     global executor
     if not isinstance(models, list):
@@ -69,6 +76,9 @@ def run_simulation(models: list[Model]|Model,
         env, env_options = env
     else:
         env_options = {}
+
+    if make_env is None:
+        make_env = lambda: gym.make(env, render_mode=None, **env_options)
 
     if repetitions == 1:
         render_mode = "human" if render else None
@@ -82,7 +92,7 @@ def run_simulation(models: list[Model]|Model,
     batches = repetitions*len(models)//batch_size
 
     tasks = [
-        (model, gym.make(env, **env_options), max_steps, batch_size)
+        (model, make_env(), max_steps, batch_size)
         for model in itertools.islice(itertools.cycle(models), batches)
     ]
 

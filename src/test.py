@@ -7,7 +7,7 @@ from models.nn_model import NeuralNetworkModel
 
 
 env = gym.make("LunarLander-v3", 
-               continuous=True, 
+               continuous=False, 
                #human display
                render_mode="human")
                
@@ -22,16 +22,16 @@ args = parser.parse_args()
 
 model_path = args.resume
 
-
+# Ensure model is correctly instantiated
+model = NeuralNetworkModel(8, 4, [32, 16])
 if model_path:
-      model = torch.load(model_path)
-else:
-      model = NeuralNetworkModel(8, 2, [32, 16])
-
-
+    model.load_state_dict(torch.load(model_path))
 
 for _ in range(1000):
+   observation = torch.tensor(observation, dtype=torch.float32)
    action = model(observation)
+   print(action)
+   action = np.argmax(action.detach().numpy())
    observation, reward, terminated, truncated, info = env.step(action)
 
    print(reward)
