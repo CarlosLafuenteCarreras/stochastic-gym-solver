@@ -109,19 +109,11 @@ def run():
         theta, delta = NES(w_tries_numpy, fitness, params.learning_rate, w.get_parameters(), params.npop, params.sigma)
 
 
-        if i % params.step_randomness_to_w_big == 0:
-            theta +=  np.random.normal(loc=theta, scale=np.abs(theta) * params.sigma_random_big, size=theta.shape)
-            print("randomness big at episode: ", i)
-        elif i % params.step_randomness_to_w_small == 0:
-            theta +=  np.random.normal(loc=theta, scale=np.abs(theta) * params.sigma_random_small, size=theta.shape)
-            print("randomness small at episode: ", i)
-
-        step_randomness_to_w = 100
-        if i % step_randomness_to_w == 0:
-            sigma = 0.33
-            theta += np.random.normal(loc=theta, scale=np.abs(theta) * sigma, size=theta.shape)
+        if i % params.step_randomness_to_w == 0:
+            theta +=  np.random.normal(loc=theta, scale=np.abs(theta) * params.sigma_random, size=theta.shape)
 
         w.set_parameters(theta)
+
 
 
         if i % 10 == 0:
@@ -153,17 +145,19 @@ def run():
             torch.save(w, descrp)
 
 
-        params.sigma *= 0.9995
+        params.sigma *= 0.999
 
         if params.sigma < 0.1:
             params.sigma = 0.25
 
-        params.learning_rate *= 0.9995
+        params.learning_rate *= 0.999
 
         if params.learning_rate < 0.05:
             params.learning_rate = 0.05
 
         logger.add_scalar("sigma", params.sigma, i)
+
+
     pass
 
 
