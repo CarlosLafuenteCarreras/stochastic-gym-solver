@@ -34,7 +34,7 @@ def run():
 
         instance.unwrapped.reward_shaping = True # type: ignore
         # reduce the penalty for crashing
-        instance.unwrapped.crash_penalty = -10 # type: ignore
+        instance.unwrapped.crash_penalty = -100 # type: ignore
         # # gravity is weaker
         instance.unwrapped.gravity = -5 # type: ignore
         # wind is weaker
@@ -46,23 +46,23 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
-    params.hidden_layers = [4] # [64, 64]
+    params.hidden_layers = [8] # [64, 64]
 
     params.batch_size = 10
-    params.repetitions = 100
+    params.repetitions = 200
     params.max_steps = 190
 
     params.episodes = 50_000 
 
     # hiperparameters
-    params.learning_rate = 0.05
-    params.sigma = 0.5
-    params.npop = 10
+    params.learning_rate = 0.15
+    params.sigma = 1
+    params.npop = 15
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
     print(w.get_parameters().shape)
     if params.resume:
-        w.load_state_dict(torch.load(params.resume))
+        w = torch.load(params.resume)
 
     population = [w.new_from_parameters(w.get_parameters()) for _ in range(params.npop)]
 
@@ -70,9 +70,8 @@ def run():
 
     logger.flush()
 
-
     def fitness_function(models: list[NeuralNetworkModel], i: int):
-        
+
         fitness, lenghts = run_simulation(models, # type: ignore
                                         params.env, 
                                         params.max_steps, 
@@ -134,8 +133,8 @@ def run():
 
         params.learning_rate *= 0.999
 
-        if params.learning_rate < 0.01:
-            params.learning_rate = 0.01
+        if params.learning_rate < 0.05:
+            params.learning_rate = 0.05
 
         logger.add_scalar("sigma", params.sigma, i)
 

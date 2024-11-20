@@ -31,12 +31,17 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
     fitness = 0.0
 
     for i in range(max_steps):
-        observation, reward, terminated, truncated, done = env.step(model.make_decision(observation))
+        decision = model.make_decision(observation)
+        observation, reward, terminated, truncated, done = env.step(decision)
         if reward < 0.0 and reward > -5.0:
             reward = 0
         
         if reward <= -100:
             reward = -10
+
+        # if choosed action is 0 (do nothing) then give a small penalty
+        if decision == 0:
+            reward -= 0.1
 
         fitness += reward
 
