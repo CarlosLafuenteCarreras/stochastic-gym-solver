@@ -56,10 +56,10 @@ def run():
     params.episodes = 50_000 
 
     # hiperparameters
-    params.step_randomness_to_w = 100
-    params.sigma_random = 0.25
+    params.step_randomness_to_w = 500
+    params.sigma_random = 0.15
     params.learning_rate = 0.15
-    params.sigma = 2
+    params.sigma = 1
     params.npop = 30
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
@@ -124,9 +124,6 @@ def run():
                                         make_env=make_env,
                                     )
             
-            model_penaty = w.get_model_penalty()*params.model_penalty
-            reference_fitness -= model_penaty
-            
             episodes.set_description(f"Fitness: {reference_fitness.mean():.2f}")
             logger.add_scalar("reference_fitness", reference_fitness.mean(), i)
             logger.add_histogram("w_delta", delta, i)
@@ -152,6 +149,7 @@ def run():
 
         if params.learning_rate < 0.05:
             params.learning_rate = 0.05
+            params.sigma_random = 0.05
 
         logger.add_scalar("sigma", params.sigma, i)
 
