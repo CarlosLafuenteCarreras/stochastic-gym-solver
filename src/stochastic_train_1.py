@@ -95,21 +95,29 @@ def run():
         w_tries_numpy = sample_distribution(w, population, params.sigma, params.npop)
 
         fitness = fitness_function(population, i)
-        
+
         theta, delta = NES(w_tries_numpy, fitness, params.learning_rate, w.get_parameters(), params.npop, params.sigma)
+
+
+        step_randomness_to_w = 100
+        if i % step_randomness_to_w == 0:
+            sigma = 0.33
+            theta +=  np.random.normal(loc=theta, scale=np.abs(theta) * sigma, size=theta.shape)
+
         w.set_parameters(theta)
+
 
 
         if i % 10 == 0:
             reference_fitness, _ = run_simulation([w], # type: ignore
-                                        params.env, 
-                                        params.max_steps, 
-                                        repetitions=200, 
-                                        batch_size=10,
-                                        progress_bar=False,
-                                        make_env=make_env,
-                                    )
-            
+                                                  params.env,
+                                                  params.max_steps,
+                                                  repetitions=200,
+                                                  batch_size=10,
+                                                  progress_bar=False,
+                                                  make_env=make_env,
+                                                  )
+
             episodes.set_description(f"Fitness: {reference_fitness.mean():.2f}")
             logger.add_scalar("reference_fitness", reference_fitness.mean(), i)
             logger.add_histogram("w_delta", delta, i)
@@ -124,7 +132,7 @@ def run():
             descrp = get_file_descriptor(params, i)
 
             torch.save(w, descrp)
-            
+
 
         params.sigma *= 0.999
 
