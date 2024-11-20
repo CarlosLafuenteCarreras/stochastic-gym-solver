@@ -47,17 +47,18 @@ def run():
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
     params.hidden_layers = [8] # [64, 64]
+    params.model_penalty = 0.05
 
     params.batch_size = 10
-    params.repetitions = 200
+    params.repetitions = 100
     params.max_steps = 190
 
     params.episodes = 50_000 
 
     # hiperparameters
     params.learning_rate = 0.15
-    params.sigma = 1
-    params.npop = 15
+    params.sigma = 2
+    params.npop = 30
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
     print(w.get_parameters().shape)
@@ -80,9 +81,15 @@ def run():
                                         progress_bar=False,
                                         make_env=make_env,
                                         )
+                                        
+        # add model penalty
+        model_penaties = np.array([model.get_model_penalty()*params.model_penalty for model in models])
+        fitness -= model_penaties
+            
         if i % 10 == 0:
             logger.add_histogram("fitness_hist", fitness, i)
-        
+            logger.add_histogram("model_penalties", model_penaties, i)
+
         logger.add_scalar("fitness_mean", fitness.mean(), i)
         logger.add_scalar("steps_mean", lenghts.mean(), i)
 
@@ -109,6 +116,9 @@ def run():
                                         progress_bar=False,
                                         make_env=make_env,
                                     )
+            
+            model_penaty = w.get_model_penalty()*params.model_penalty
+            reference_fitness -= model_penaty
             
             episodes.set_description(f"Fitness: {reference_fitness.mean():.2f}")
             logger.add_scalar("reference_fitness", reference_fitness.mean(), i)
@@ -138,8 +148,10 @@ def run():
 
         logger.add_scalar("sigma", params.sigma, i)
 
-        logger.flush()
-        
+              if i % 100 == 0:
+            sample_distribution(w, [w], params.sigma/2, 1)
+
+
 
     pass
 

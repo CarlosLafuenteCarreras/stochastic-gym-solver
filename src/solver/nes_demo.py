@@ -91,7 +91,7 @@ def NES(samples: np.ndarray, fitness:np.ndarray, learning_rate:float, theta: np.
   gradient = (fitness - np.mean(fitness)) / np.std(fitness)
 
   d_theta = alpha * np.dot(F_inverse, gradient)
-  theta += d_theta
+  theta += d_theta # maybe add acceleration here
 
   return theta, d_theta
 

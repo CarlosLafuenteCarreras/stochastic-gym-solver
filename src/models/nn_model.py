@@ -105,6 +105,14 @@ class NeuralNetworkModel(Model, nn.Module):
             # Update current position.
             current_position += param_size
 
+    def get_model_penalty(self,) -> float:
+        # get r2 of each layer
+        # return sum of r2 of each layer
+        penalty = 0
+        for param in self.linear.parameters():
+            penalty += torch.sum(param**2)
+
+        return float(penalty)
 
 
 if __name__ == "__main__":

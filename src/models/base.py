@@ -9,4 +9,7 @@ class Model:
     
     def set_parameters(self, parameters: dict):
         raise NotImplementedError()
+    
+    def get_model_penalty(self) -> float:
+        return 0.0
 
