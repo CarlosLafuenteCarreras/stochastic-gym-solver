@@ -11,8 +11,6 @@ from episode_runner import run_simulation
 from models.nn_model import NeuralNetworkModel
 from solver.nes_demo import NES, sample_distribution
 
-
-
 def run():
     repo = Repo(search_parent_directories=True)
 
@@ -36,13 +34,11 @@ def run():
 
         instance.unwrapped.reward_shaping = True # type: ignore
         # reduce the penalty for crashing
-        # instance.unwrapped.crash_penalty = -10 # type: ignore
-        # # reduce initial velocity
-        # instance.unwrapped.initial_random = 0.1 # type: ignore
+        instance.unwrapped.crash_penalty = -10 # type: ignore
         # # gravity is weaker
-        # instance.unwrapped.gravity = 5 # type: ignore
+        instance.unwrapped.gravity = -5 # type: ignore
         # wind is weaker
-        instance.unwrapped.wind_power = 0.1 # type: ignore
+        instance.unwrapped.wind_power = 0 # type: ignore
         
         return instance
 
@@ -50,18 +46,18 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
-    params.hidden_layers = [8, 8, 4] # [64, 64]
+    params.hidden_layers = [4] # [64, 64]
 
     params.batch_size = 10
-    params.repetitions = 20
+    params.repetitions = 100
     params.max_steps = 190
 
     params.episodes = 50_000 
 
     # hiperparameters
-    params.learning_rate = 0.01
+    params.learning_rate = 0.05
     params.sigma = 0.5
-    params.npop = 50
+    params.npop = 10
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
     print(w.get_parameters().shape)
@@ -128,12 +124,13 @@ def run():
             # save w to disk
             descrp = get_file_descriptor(params, i)
 
-            torch.save(w.state_dict(), descrp)
+            torch.save(w, descrp)
+            
 
         params.sigma *= 0.999
 
         if params.sigma < 0.1:
-            params.sigma = 0.1
+            params.sigma = 0.25
 
         params.learning_rate *= 0.999
 
