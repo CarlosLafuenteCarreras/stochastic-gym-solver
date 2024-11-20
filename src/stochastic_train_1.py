@@ -56,6 +56,8 @@ def run():
     params.episodes = 50_000 
 
     # hiperparameters
+    params.step_randomness_to_w = 100
+    params.sigma_random = 0.25
     params.learning_rate = 0.15
     params.sigma = 2
     params.npop = 30
@@ -82,7 +84,6 @@ def run():
                                         make_env=make_env,
                                         )
                                         
-        # add model penalty
         model_penaties = np.array([model.get_model_penalty()*params.model_penalty for model in models])
         fitness -= model_penaties
             
@@ -102,9 +103,15 @@ def run():
         w_tries_numpy = sample_distribution(w, population, params.sigma, params.npop)
 
         fitness = fitness_function(population, i)
-        
+
         theta, delta = NES(w_tries_numpy, fitness, params.learning_rate, w.get_parameters(), params.npop, params.sigma)
+
+
+        if i % params.step_randomness_to_w == 0:
+            theta +=  np.random.normal(loc=theta, scale=np.abs(theta) * params.sigma_random, size=theta.shape)
+
         w.set_parameters(theta)
+
 
 
         if i % 10 == 0:
@@ -134,7 +141,7 @@ def run():
             descrp = get_file_descriptor(params, i)
 
             torch.save(w, descrp)
-            
+
 
         params.sigma *= 0.999
 
@@ -147,10 +154,6 @@ def run():
             params.learning_rate = 0.05
 
         logger.add_scalar("sigma", params.sigma, i)
-
-              if i % 100 == 0:
-            sample_distribution(w, [w], params.sigma/2, 1)
-
 
 
     pass
