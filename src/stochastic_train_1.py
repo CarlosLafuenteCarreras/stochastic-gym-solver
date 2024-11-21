@@ -46,20 +46,20 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
-    params.hidden_layers = [8] # [64, 64]
-    params.model_penalty = 0.05
+    params.hidden_layers = [16, 16] # [64, 64]
+    params.model_penalty = 0.1
 
-    params.batch_size = 10
+    params.batch_size = 5
     params.repetitions = 100
     params.max_steps = 190
 
     params.episodes = 50_000 
 
     # hiperparameters
-    params.step_randomness_to_w_small = 2000000
-    params.step_randomness_to_w_big = 5000000
-    params.sigma_random_small = 0.05
-    params.sigma_random_big = 0.2
+    params.step_randomness_to_w_small = 100
+    params.step_randomness_to_w_big = 1000
+    params.sigma_random_small = 0.01
+    params.sigma_random_big = 0.1
     params.learning_rate = 0.15
     params.sigma = 5
     params.npop = 15
@@ -110,9 +110,9 @@ def run():
 
 
         if i % params.step_randomness_to_w_big == 0 and i > 1:
-            theta += np.random.normal(loc=theta, scale=np.abs(theta) * params.sigma_random_big, size=theta.shape)
+            theta += np.random.normal(loc=0, scale=params.sigma_random_big, size=theta.shape)
         elif i % params.step_randomness_to_w_small == 0 and i > 1:
-            theta += np.random.normal(loc=theta, scale=np.abs(theta) * params.sigma_random_small, size=theta.shape)
+            theta += np.random.normal(loc=0, scale=params.sigma_random_small, size=theta.shape)
 
         w.set_parameters(theta)
 
@@ -147,16 +147,15 @@ def run():
             torch.save(w, descrp)
 
 
-        params.sigma *= 0.9995
+        params.sigma *= 0.999
 
         if params.sigma < 0.1:
             params.sigma = 3
 
-        params.learning_rate *= 0.9995
+        params.learning_rate *= 0.999
 
         if params.learning_rate < 0.05:
             params.learning_rate = 0.15
-            params.sigma_random = 0.1
 
         logger.add_scalar("sigma", params.sigma, i)
 
