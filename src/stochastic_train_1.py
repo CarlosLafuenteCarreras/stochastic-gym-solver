@@ -46,28 +46,33 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
-    params.hidden_layers = [16, 16] # [64, 64]
-    params.model_penalty = 0.1
+    params.hidden_layers = [12, 12] # [64, 64]
+    params.model_penalty = 0.005
 
-    params.batch_size = 5
-    params.repetitions = 100
-    params.max_steps = 190
+    params.eposode_start = 0
+    params.batch_size = 20
+    params.repetitions = 50
+    params.max_steps = 150
 
     params.episodes = 50_000 
 
     # hiperparameters
-    params.step_randomness_to_w_small = 100
+    params.step_randomness_to_w_small = 200
     params.step_randomness_to_w_big = 1000
     params.sigma_random_small = 0.01
-    params.sigma_random_big = 0.1
-    params.learning_rate = 0.15
+    params.sigma_random_big = 0.2
+    params.learning_rate = 0.25
     params.sigma = 5
-    params.npop = 15
+    params.npop = 30
+
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
     print(w.get_parameters().shape)
     if params.resume:
         w = torch.load(params.resume)
+        params.eposode_start = int(params.resume.split("_")[-1].split(".")[0])
+        print(f"Resuming from episode {params.eposode_start}")
+
 
     population = [w.new_from_parameters(w.get_parameters()) for _ in range(params.npop)]
 
@@ -99,7 +104,11 @@ def run():
         return fitness.mean(axis=0)
 
 
-    episodes = tqdm.trange(params.episodes)
+    episodes = tqdm.trange(
+        params.eposode_start, 
+        params.episodes + params.eposode_start,
+        desc="Fitness",
+    )
     
     for i in episodes:
         w_tries_numpy = sample_distribution(w, population, params.sigma, params.npop)
@@ -115,8 +124,6 @@ def run():
             theta += np.random.normal(loc=0, scale=params.sigma_random_small, size=theta.shape)
 
         w.set_parameters(theta)
-
-
 
         if i % 10 == 0:
             reference_fitness, _ = run_simulation([w], # type: ignore
@@ -155,7 +162,7 @@ def run():
         params.learning_rate *= 0.999
 
         if params.learning_rate < 0.05:
-            params.learning_rate = 0.15
+            params.learning_rate = 0.25
 
         logger.add_scalar("sigma", params.sigma, i)
 
