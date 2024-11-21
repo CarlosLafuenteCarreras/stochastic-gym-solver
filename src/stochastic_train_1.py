@@ -46,12 +46,12 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
-    params.hidden_layers = [8] # [64, 64]
+    params.hidden_layers = [12, 12] # [64, 64]
     params.model_penalty = 0.05
 
     params.batch_size = 10
-    params.repetitions = 100
-    params.max_steps = 190
+    params.repetitions = 5
+    params.max_steps = 130
 
     params.episodes = 50_000 
 
@@ -60,9 +60,9 @@ def run():
     params.step_randomness_to_w_big = 5000000
     params.sigma_random_small = 0.05
     params.sigma_random_big = 0.2
-    params.learning_rate = 0.15
+    params.learning_rate = 0.25
     params.sigma = 5
-    params.npop = 15
+    params.npop = 30
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
     print(w.get_parameters().shape)
@@ -147,12 +147,12 @@ def run():
             torch.save(w, descrp)
 
 
-        params.sigma *= 0.9995
+        params.sigma *= 0.99999
 
         if params.sigma < 0.1:
             params.sigma = 3
 
-        params.learning_rate *= 0.9995
+        params.learning_rate *= 0.99999
 
         if params.learning_rate < 0.05:
             params.learning_rate = 0.15
