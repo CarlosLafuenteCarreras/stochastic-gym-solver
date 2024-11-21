@@ -34,7 +34,7 @@ def run():
 
         instance.unwrapped.reward_shaping = True # type: ignore
         # reduce the penalty for crashing
-        instance.unwrapped.crash_penalty = -100 # type: ignore
+        instance.unwrapped.crash_penalty = -50 # type: ignore
         # # gravity is weaker
         instance.unwrapped.gravity = -5 # type: ignore
         # wind is weaker
@@ -49,7 +49,7 @@ def run():
     params.hidden_layers = [8] # [64, 64]
     params.model_penalty = 0.05
 
-    params.batch_size = 10
+    params.batch_size = 2
     params.repetitions = 100
     params.max_steps = 190
 
@@ -59,8 +59,8 @@ def run():
     params.step_randomness_to_w = 500
     params.sigma_random = 0.15
     params.learning_rate = 0.15
-    params.sigma = 1
-    params.npop = 30
+    params.sigma = 5
+    params.npop = 15
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
     print(w.get_parameters().shape)
@@ -108,7 +108,7 @@ def run():
 
 
         if i % params.step_randomness_to_w == 0:
-            theta +=  np.random.normal(loc=theta, scale=np.abs(theta) * params.sigma_random, size=theta.shape)
+            theta +=  np.random.normal(loc=0, scale=params.sigma_random, size=theta.shape)
 
         w.set_parameters(theta)
 
@@ -141,15 +141,14 @@ def run():
 
 
         params.sigma *= 0.999
-
         if params.sigma < 0.1:
-            params.sigma = 0.25
+            params.sigma = 3
 
         params.learning_rate *= 0.999
 
         if params.learning_rate < 0.05:
-            params.learning_rate = 0.05
-            params.sigma_random = 0.05
+            params.learning_rate = 0.15
+            params.sigma_random = 0.1
 
         logger.add_scalar("sigma", params.sigma, i)
 
