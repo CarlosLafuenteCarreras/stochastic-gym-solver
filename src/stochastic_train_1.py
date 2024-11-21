@@ -5,7 +5,6 @@ import tensorboardX
 from git.repo import Repo
 import torch
 import tqdm
-import time
 
 from common import get_file_descriptor, splash_screen
 from episode_runner import run_simulation
@@ -51,10 +50,10 @@ def run():
     params.model_penalty = 0.05
 
     params.batch_size = 10
-    params.repetitions = 10
+    params.repetitions = 100
     params.max_steps = 190
 
-    params.episodes = 5000
+    params.episodes = 50_000 
 
     # hiperparameters
     params.step_randomness_to_w_small = 2000000
@@ -62,8 +61,8 @@ def run():
     params.sigma_random_small = 0.05
     params.sigma_random_big = 0.2
     params.learning_rate = 0.15
-    params.sigma = 1
-    params.npop = 30
+    params.sigma = 5
+    params.npop = 15
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
     print(w.get_parameters().shape)
@@ -79,24 +78,24 @@ def run():
     def fitness_function(models: list[NeuralNetworkModel], i: int):
 
         fitness, lenghts = run_simulation(models, # type: ignore
-                                          params.env,
-                                          params.max_steps,
-                                          repetitions=params.repetitions,
-                                          batch_size=params.batch_size,
-                                          progress_bar=False,
-                                          make_env=make_env,
-                                          )
-
+                                        params.env, 
+                                        params.max_steps, 
+                                        repetitions=params.repetitions, 
+                                        batch_size=params.batch_size,
+                                        progress_bar=False,
+                                        make_env=make_env,
+                                        )
+                                        
         model_penaties = np.array([model.get_model_penalty()*params.model_penalty for model in models])
-
         fitness -= model_penaties
-
+            
         if i % 10 == 0:
             logger.add_histogram("fitness_hist", fitness, i)
             logger.add_histogram("model_penalties", model_penaties, i)
 
         logger.add_scalar("fitness_mean", fitness.mean(), i)
         logger.add_scalar("steps_mean", lenghts.mean(), i)
+
         return fitness.mean(axis=0)
 
 
@@ -121,19 +120,17 @@ def run():
 
         if i % 10 == 0:
             reference_fitness, _ = run_simulation([w], # type: ignore
-                                        params.env,
-                                        params.max_steps,
-                                        repetitions=200,
+                                        params.env, 
+                                        params.max_steps, 
+                                        repetitions=200, 
                                         batch_size=10,
                                         progress_bar=False,
                                         make_env=make_env,
                                     )
-
+            
             model_penaty = w.get_model_penalty()*params.model_penalty
-
             reference_fitness -= model_penaty
-
-
+            
             episodes.set_description(f"Fitness: {reference_fitness.mean():.2f}")
             logger.add_scalar("reference_fitness", reference_fitness.mean(), i)
             logger.add_histogram("w_delta", delta, i)
@@ -153,12 +150,13 @@ def run():
         params.sigma *= 0.9995
 
         if params.sigma < 0.1:
-            params.sigma = 0.25
+            params.sigma = 3
 
         params.learning_rate *= 0.9995
 
         if params.learning_rate < 0.05:
-            params.learning_rate = 0.05
+            params.learning_rate = 0.15
+            params.sigma_random = 0.1
 
         logger.add_scalar("sigma", params.sigma, i)
 

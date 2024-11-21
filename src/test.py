@@ -37,7 +37,7 @@ model_path = args.resume
 
 model = torch.load(model_path, weights_only=False)
 
-for _ in range(1000):
+while True:
    observation = torch.tensor(observation, dtype=torch.float32)
    action = model(observation)
 
