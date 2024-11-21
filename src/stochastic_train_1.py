@@ -56,8 +56,10 @@ def run():
     params.episodes = 50_000 
 
     # hiperparameters
-    params.step_randomness_to_w = 500
-    params.sigma_random = 0.15
+    params.step_randomness_to_w_small = 50
+    params.step_randomness_to_w_big = 500
+    params.sigma_random_small = 0.25
+    params.sigma_random_big = 1
     params.learning_rate = 0.15
     params.sigma = 5
     params.npop = 15
@@ -123,6 +125,9 @@ def run():
                                         progress_bar=False,
                                         make_env=make_env,
                                     )
+            
+            model_penaty = w.get_model_penalty()*params.model_penalty
+            reference_fitness -= model_penaty
             
             episodes.set_description(f"Fitness: {reference_fitness.mean():.2f}")
             logger.add_scalar("reference_fitness", reference_fitness.mean(), i)
