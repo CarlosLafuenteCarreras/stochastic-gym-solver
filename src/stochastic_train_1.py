@@ -35,6 +35,8 @@ def run():
         instance.unwrapped.reward_shaping = True # type: ignore
         # reduce the penalty for crashing
         instance.unwrapped.crash_penalty = -100 # type: ignore
+        # increase the reward for landing
+        instance.unwrapped.landing_reward = 500 # type: ignore
         # # gravity is weaker
         instance.unwrapped.gravity = -5 # type: ignore
         # wind is weaker
@@ -46,21 +48,21 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
-    params.hidden_layers = [12, 12] # [64, 64]
-    params.model_penalty = 0.005
+    params.hidden_layers = [32, 16] # [64, 64]
+    params.model_penalty = 0.01
 
     params.eposode_start = 0
     params.batch_size = 20
-    params.repetitions = 50
+    params.repetitions = 100
     params.max_steps = 150
 
-    params.episodes = 50_000 
+    params.episodes = 50_000
 
     # hiperparameters
-    params.step_randomness_to_w_small = 200
-    params.step_randomness_to_w_big = 1000
+    params.step_randomness_to_w_small = 100
+    params.step_randomness_to_w_big = 1200
     params.sigma_random_small = 0.01
-    params.sigma_random_big = 0.2
+    params.sigma_random_big = 0.1
     params.learning_rate = 0.25
     params.sigma = 5
     params.npop = 30
@@ -135,9 +137,6 @@ def run():
                                         make_env=make_env,
                                     )
             
-            model_penaty = w.get_model_penalty()*params.model_penalty
-            reference_fitness -= model_penaty
-            
             episodes.set_description(f"Fitness: {reference_fitness.mean():.2f}")
             logger.add_scalar("reference_fitness", reference_fitness.mean(), i)
             logger.add_histogram("w_delta", delta, i)
@@ -156,8 +155,8 @@ def run():
 
         params.sigma *= 0.999
 
-        if params.sigma < 0.1:
-            params.sigma = 3
+        if params.sigma < 1:
+            params.sigma = 5
 
         params.learning_rate *= 0.999
 
