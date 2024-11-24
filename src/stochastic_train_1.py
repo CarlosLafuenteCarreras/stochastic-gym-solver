@@ -49,7 +49,7 @@ def run():
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
     params.hidden_layers = [32, 16] # [64, 64]
-    params.model_penalty = 0.01
+    params.model_penalty = 0.0001
 
     params.eposode_start = 0
     params.batch_size = 20
@@ -64,7 +64,7 @@ def run():
     params.sigma_random_small = 0.01
     params.sigma_random_big = 0.1
     params.learning_rate = 0.25
-    params.sigma = 5
+    params.sigma = 3
     params.npop = 30
 
 
@@ -156,7 +156,7 @@ def run():
         params.sigma *= 0.999
 
         if params.sigma < 1:
-            params.sigma = 5
+            params.sigma = 3
 
         params.learning_rate *= 0.999
 
