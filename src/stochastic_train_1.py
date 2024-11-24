@@ -53,14 +53,14 @@ def run():
 
     params.eposode_start = 0
     params.batch_size = 20
-    params.repetitions = 100
+    params.repetitions = 150
     params.max_steps = 150
 
     params.episodes = 50_000
 
     # hiperparameters
     params.step_randomness_to_w_small = 100
-    params.step_randomness_to_w_big = 1200
+    params.step_randomness_to_w_big = 2500
     params.sigma_random_small = 0.01
     params.sigma_random_big = 0.1
     params.learning_rate = 0.25

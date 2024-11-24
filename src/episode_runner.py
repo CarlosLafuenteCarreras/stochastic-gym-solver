@@ -38,9 +38,9 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
 
         # if choosed action is 0 (do nothing) then give a small penalty
         if decision == 0:
-            reward = -0.1
+            reward += -0.3
         else:
-            reward = 0.1
+            reward += 0.3
 
         fitness += reward
 
