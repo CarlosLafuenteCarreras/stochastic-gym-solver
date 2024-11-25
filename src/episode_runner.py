@@ -1,4 +1,5 @@
 import itertools
+import re
 from typing import Callable
 import gymnasium as gym
 from tqdm import tqdm
@@ -31,16 +32,54 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
     fitness = 0.0
 
     for i in range(max_steps):
+        # Decision step
         decision = model.make_decision(observation)
         observation, reward, terminated, truncated, done = env.step(decision)
-        if reward < 0.0 and reward > -5.0:
-            reward = -0.1
 
-        # if choosed action is 0 (do nothing) then give a small penalty
-        if decision == 0:
-            reward += -0.3
+        # Baseline penalties for neutral or negative actions
+        if -5 < reward < 0:
+            reward = -0.01
+        elif reward > 0:
+            reward *= 2
+
+        # Penalize 'do nothing' excessively only if it doesn't reduce velocity
+        if decision == 0 and abs(observation[1]) > 0.1:
+            reward -= 1
         else:
-            reward += 0.3
+            reward += 0.5
+
+        # Stabilize rotation towards zero
+        reward += 1.0 - abs(observation[2])
+
+        # Keep position close to the center (horizontal)
+        reward += max(0, 1.0 - abs(observation[0]))
+
+        # Encourage low velocities
+        reward += max(0, 1.0 - abs(observation[1]))  # Horizontal velocity
+        reward += max(0, 1.0 - abs(observation[3]))  # Vertical velocity
+
+        # Angular correction rewards
+        if observation[2] > 0 and decision == 3:  # Correct positive angle
+            reward += 1.0
+        elif observation[2] < 0 and decision == 1:  # Correct negative angle
+            reward += 1.0
+
+        # Main engine steering rewards
+        if (observation[2] > 0 and observation[0] > 0 and decision == 2) or \
+        (observation[2] < 0 and observation[0] < 0 and decision == 2):
+            reward += 1.0
+
+        # Reward for achieving stability thresholds
+        if abs(observation[0]) < 0.1:  # Horizontal position near center
+            reward += 1.0
+        if abs(observation[1]) < 0.1:  # Horizontal velocity near zero
+            reward += 1.0
+        if abs(observation[3]) < 0.1:  # Vertical velocity near zero
+            reward += 1.0
+
+        # Dynamic shaping decay (optional)
+        # Reduce shaped rewards as agent learns to stabilize
+        reward *= 1.0 - min(1.0, abs(observation[0] + observation[2]) * 0.1)
 
         fitness += reward
 

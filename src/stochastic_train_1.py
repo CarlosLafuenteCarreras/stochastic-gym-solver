@@ -34,9 +34,9 @@ def run():
 
         instance.unwrapped.reward_shaping = True # type: ignore
         # reduce the penalty for crashing
-        instance.unwrapped.crash_penalty = -100 # type: ignore
+        instance.unwrapped.crash_penalty = -5 # type: ignore
         # increase the reward for landing
-        instance.unwrapped.landing_reward = 500 # type: ignore
+        instance.unwrapped.landing_reward = 100 # type: ignore
         # # gravity is weaker
         instance.unwrapped.gravity = -5 # type: ignore
         # wind is weaker
@@ -48,24 +48,24 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
-    params.hidden_layers = [32, 16] # [64, 64]
-    params.model_penalty = 0.0001
+    params.hidden_layers = [4] # [64, 64]
+    params.model_penalty = 0.005
 
     params.eposode_start = 0
-    params.batch_size = 20
-    params.repetitions = 150
+    params.batch_size = 10
+    params.repetitions = 100
     params.max_steps = 150
 
     params.episodes = 50_000
 
     # hiperparameters
     params.step_randomness_to_w_small = 100
-    params.step_randomness_to_w_big = 2500
-    params.sigma_random_small = 0.01
+    params.step_randomness_to_w_big = 1000
+    params.sigma_random_small = 0.005
     params.sigma_random_big = 0.1
-    params.learning_rate = 0.25
+    params.learning_rate = 0.15
     params.sigma = 3
-    params.npop = 30
+    params.npop = 60
 
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
@@ -155,12 +155,12 @@ def run():
 
         params.sigma *= 0.999
 
-        if params.sigma < 1:
-            params.sigma = 3
+        if params.sigma < 1.5:
+            params.sigma = 2.5
 
         params.learning_rate *= 0.999
 
-        if params.learning_rate < 0.05:
+        if params.learning_rate < 0.1:
             params.learning_rate = 0.25
 
         logger.add_scalar("sigma", params.sigma, i)
