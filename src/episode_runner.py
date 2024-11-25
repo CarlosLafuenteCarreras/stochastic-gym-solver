@@ -70,16 +70,10 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
             reward += 1.0
 
         # Reward for achieving stability thresholds
-        if abs(observation[0]) < 0.1:  # Horizontal position near center
-            reward += 1.0
-        if abs(observation[1]) < 0.1:  # Horizontal velocity near zero
-            reward += 1.0
-        if abs(observation[3]) < 0.1:  # Vertical velocity near zero
-            reward += 1.0
-
-        # Dynamic shaping decay (optional)
-        # Reduce shaped rewards as agent learns to stabilize
-        reward *= 1.0 - min(1.0, abs(observation[0] + observation[2]) * 0.1)
+        reward += max(0, 1.0 - abs(observation[0]))*2  # Horizontal position near center
+        reward += max(0, 1.0 - abs(observation[3]))    # Vertical velocity near zero
+        reward += max(0, 1.0 - abs(observation[1]))    # Horizontal velocity near zero
+        reward += max(0, 1.0 - abs(observation[2]))    # Angular velocity near zero
 
         fitness += reward
 

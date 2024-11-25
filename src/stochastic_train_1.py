@@ -34,7 +34,7 @@ def run():
 
         instance.unwrapped.reward_shaping = True # type: ignore
         # reduce the penalty for crashing
-        instance.unwrapped.crash_penalty = -5 # type: ignore
+        instance.unwrapped.crash_penalty = -50 # type: ignore
         # increase the reward for landing
         instance.unwrapped.landing_reward = 100 # type: ignore
         # # gravity is weaker
@@ -53,7 +53,7 @@ def run():
 
     params.eposode_start = 0
     params.batch_size = 10
-    params.repetitions = 100
+    params.repetitions = 50
     params.max_steps = 150
 
     params.episodes = 50_000
@@ -65,7 +65,7 @@ def run():
     params.sigma_random_big = 0.1
     params.learning_rate = 0.15
     params.sigma = 3
-    params.npop = 60
+    params.npop = 30
 
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
