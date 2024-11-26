@@ -47,11 +47,11 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
         #         reward += 0.5
 
         # Reward stabilizing rotation towards zero angle
-        reward += (1.0 - abs(angle))*0.05
+        reward += (1.0 - abs(angle))*0.01
 
         # Reward reducing velocities (horizontal and vertical)
-        reward += max(0, 1.0 - abs(v_x)) * 0.05
-        reward += max(0, 1.0 - abs(v_y+0.5)) * 0.8
+        reward += max(0, 1.0 - abs(v_x)) * 0.01
+        reward += max(0, 1.0 - abs(v_y+0.5)) * 0.1
 
         # penaly for hovering 
         if abs(v_y) < 0.1:
@@ -60,7 +60,7 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
         # Reward main engine steering for stabilizing both angle and position
         if (angle > 0 and x > 0 and decision == 2) or \
         (angle < 0 and x < 0 and decision == 2):
-            reward += 0.05
+            reward += 0.01
 
         # Heavlily penalize going out of 2.0 rage off the center
         if abs(x) > 1.25:
@@ -70,10 +70,10 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
             reward -= 3
 
         # Heavily reward achieving stability across all key metrics
-        reward += max(0, 1.0 - abs(x)) * 1
-        reward += max(0, 1.0 - abs(v_y))*0.05
-        reward += max(0, 1.0 - abs(v_x))*0.05
-        reward += max(0, 1.0 - abs(ang_vel))*0.1
+        reward += max(0, 1.0 - abs(x)) * 0.1
+        reward += max(0, 1.0 - abs(v_y))*0.01
+        reward += max(0, 1.0 - abs(v_x))*0.01
+        reward += max(0, 1.0 - abs(ang_vel))*0.01
 
         if leg1 == 1 or leg2 == 1:
             reward += 25

@@ -41,12 +41,12 @@ while True:
    observation = torch.tensor(observation, dtype=torch.float32)
    action = model(observation)
 
-   print(action, observation)
    
    action = np.argmax(action.detach().numpy())
+   print(action, '\t'.join([str(round(float(i),2)) for i in observation.to('cpu').detach().numpy()]))
    observation, reward, terminated, truncated, info = env.step(action)
 
-   print(reward)
+   #print(reward)
 
    if terminated or truncated:
       observation, info = env.reset()
