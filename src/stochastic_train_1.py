@@ -48,8 +48,8 @@ def run():
 
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
-    params.hidden_layers = [4] # [64, 64]
-    params.model_penalty = 0.005
+    params.hidden_layers = [16, 4]
+    params.model_penalty = 0.003
 
     params.eposode_start = 0
     params.batch_size = 10
