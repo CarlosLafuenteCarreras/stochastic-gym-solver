@@ -39,15 +39,9 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
         # Unpack the observation vector
         x, y, v_x, v_y, angle, ang_vel, leg1, leg2 = observation
 
-        # Baseline penalties and amplification of positive rewards
-        if -5 < reward < 0:
-            reward = -0.01 
-        elif reward > 0:
-            reward *= 2
-
         # Penalize inaction unless vertical velocity is negligible
         if decision == 0:
-            if abs(v_y) > 0.1: 
+            if abs(v_y) > 0.20: 
                 reward -= 1 
             else:
                 reward += 0.5
@@ -55,33 +49,24 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
         # Reward stabilizing rotation towards zero angle
         reward += 1.0 - abs(angle)  
 
-        # Reward proximity to the center (horizontal position)
-        reward += max(0, 1.0 - abs(x)) 
-
         # Reward reducing velocities (horizontal and vertical)
-        reward += max(0, 1.0 - abs(v_x)) 
-        reward += max(0, 1.0 - abs(v_y)) 
-
-        # Reward angular correction actions
-        if angle > 0 and decision == 3:
-            reward += 1.0
-        elif angle < 0 and decision == 1:
-            reward += 1.0
+        reward += max(0, 1.0 - abs(v_x)) * 0.5
+        reward += max(0, 1.0 - abs(v_y+0.25)) * 0.5
 
         # Reward main engine steering for stabilizing both angle and position
         if (angle > 0 and x > 0 and decision == 2) or \
         (angle < 0 and x < 0 and decision == 2):
-            reward += 1.0
+            reward += 0.1
+
+        # Heavlily penalize going out of 2.0 rage off the center
+        if abs(x) > 1.5:
+            reward -= 3
 
         # Heavily reward achieving stability across all key metrics
-        reward += max(0, 1.0 - abs(x)) * 2 
+        reward += max(0, 1.0 - abs(x)) * 3
         reward += max(0, 1.0 - abs(v_y))
         reward += max(0, 1.0 - abs(v_x))
         reward += max(0, 1.0 - abs(ang_vel))
-
-        # Additional reward for landing successfully (both legs in contact)
-        if leg1 > 0 and leg2 > 0:
-            reward += 10
 
         fitness += reward
 

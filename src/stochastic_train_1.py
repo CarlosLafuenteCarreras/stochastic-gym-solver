@@ -60,9 +60,9 @@ def run():
 
     # hiperparameters
     params.step_randomness_to_w_small = 100
-    params.step_randomness_to_w_big = 1000
-    params.sigma_random_small = 0.005
-    params.sigma_random_big = 0.1
+    params.step_randomness_to_w_big = 1500
+    params.sigma_random_small = 0.002
+    params.sigma_random_big = 0.08
     params.learning_rate = 0.15
     params.sigma = 3
     params.npop = 30
@@ -153,14 +153,14 @@ def run():
             torch.save(w, descrp)
 
 
-        params.sigma *= 0.999
+        params.sigma *= 0.9995
 
-        if params.sigma < 1.5:
-            params.sigma = 2.5
+        if params.sigma < 1:
+            params.sigma = 2
 
-        params.learning_rate *= 0.999
+        params.learning_rate *= 0.9995
 
-        if params.learning_rate < 0.1:
+        if params.learning_rate < 0.07:
             params.learning_rate = 0.25
 
         logger.add_scalar("sigma", params.sigma, i)

@@ -41,7 +41,7 @@ while True:
    observation = torch.tensor(observation, dtype=torch.float32)
    action = model(observation)
 
-   print(action)
+   print(action, observation)
    
    action = np.argmax(action.detach().numpy())
    observation, reward, terminated, truncated, info = env.step(action)
