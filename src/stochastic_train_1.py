@@ -38,7 +38,7 @@ def run():
         # increase the reward for landing
         instance.unwrapped.landing_reward = 100 # type: ignore
         # # gravity is weaker
-        instance.unwrapped.gravity = -6 # type: ignore
+        instance.unwrapped.gravity = -7 # type: ignore
         # wind is weaker
         instance.unwrapped.wind_power = 0 # type: ignore
         
