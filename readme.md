@@ -5,13 +5,13 @@ Stochastic Gym Solver is a project that applies the **Natural Evolution Strategi
 ## Authors
 
 - **Darek Petersen** [GitHub](https://github.com/BlueCl0wn) 
-  University of Hamburg  
+  - University of Hamburg  
 - **Juan Rubio**  
-  University of Zaragoza  
+  - University of Zaragoza  
 - **Carlos Lafuente**  [Github](https://github.com/juanchinunizar)
-  University of Zaragoza  
+  - University of Zaragoza  
 - **Maciej Złotorowicz**  
-  Akademia Górniczo-Hutnicza  [GitHub](https://github.com/Lord225) 
+  - Akademia Górniczo-Hutnicza  [GitHub](https://github.com/Lord225) 
 
 ## Features
 
@@ -30,8 +30,6 @@ Stochastic Gym Solver is a project that applies the **Natural Evolution Strategi
   - Parallelized fitness evaluations for fast training.
 - **Hyperparameter Tuning**:
     - Configurable hyperparameters for optimal performance.
-
----
 
 ## Installation
 ### Create venv/env with `python=3.10.15`
@@ -110,6 +108,8 @@ You can ajust the hiperparameters in the `stochastic_train_1.py` file.
 
 * `params.npop`
     * The population size, representing the number of candidate policies evaluated per generation. Higher values improve robustness but require more computational resources. Recommended values are `10-100`.
+
+
 
 ## Custom Reward Shaping
 The LunarLander-v3 environment is a challenging task that requires the agent to learn a complex policy to land the spacecraft safely. To facilitate the learning process, we have implemented custom reward shaping to guide the agent towards the desired behavior.
