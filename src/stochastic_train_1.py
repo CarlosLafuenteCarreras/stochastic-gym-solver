@@ -36,9 +36,9 @@ def run():
         # reduce the penalty for crashing
         instance.unwrapped.crash_penalty = -50 # type: ignore
         # increase the reward for landing
-        instance.unwrapped.landing_reward = 100 # type: ignore
+        instance.unwrapped.landing_reward = 500 # type: ignore
         # # gravity is weaker
-        instance.unwrapped.gravity = -7 # type: ignore
+        instance.unwrapped.gravity = -9 # type: ignore
         # wind is weaker
         instance.unwrapped.wind_power = 0 # type: ignore
         
@@ -53,16 +53,16 @@ def run():
 
     params.eposode_start = 0
     params.batch_size = 10
-    params.repetitions = 50
-    params.max_steps = 150
+    params.repetitions = 100
+    params.max_steps = 300
 
     params.episodes = 50_000
 
     # hiperparameters
     params.step_randomness_to_w_small = 100
-    params.step_randomness_to_w_big = 1500
-    params.sigma_random_small = 0.002
-    params.sigma_random_big = 0.08
+    params.step_randomness_to_w_big = 2000
+    params.sigma_random_small = 0.001
+    params.sigma_random_big = 0.04
     params.learning_rate = 0.15
     params.sigma = 3
     params.npop = 30
@@ -155,7 +155,7 @@ def run():
 
         params.sigma *= 0.9995
 
-        if params.sigma < 1:
+        if params.sigma < 0.5:
             params.sigma = 2
 
         params.learning_rate *= 0.9995
