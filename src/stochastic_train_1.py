@@ -34,13 +34,13 @@ def run():
 
         instance.unwrapped.reward_shaping = True # type: ignore
         # reduce the penalty for crashing
-        instance.unwrapped.crash_penalty = -50 # type: ignore
+        instance.unwrapped.crash_penalty = -100 # type: ignore
         # increase the reward for landing
         instance.unwrapped.landing_reward = 500 # type: ignore
         # # gravity is weaker
-        instance.unwrapped.gravity = -9 # type: ignore
+        instance.unwrapped.gravity = -10 # type: ignore
         # wind is weaker
-        instance.unwrapped.wind_power = 0 # type: ignore
+        instance.unwrapped.wind_power = 1.0 # type: ignore
         
         return instance
 
@@ -64,7 +64,7 @@ def run():
     params.sigma_random_small = 0.001
     params.sigma_random_big = 0.04
     params.learning_rate = 0.15
-    params.sigma = 3
+    params.sigma = 1.5
     params.npop = 30
 
 
@@ -156,7 +156,7 @@ def run():
         params.sigma *= 0.9995
 
         if params.sigma < 0.5:
-            params.sigma = 2
+            params.sigma = 1.5
 
         params.learning_rate *= 0.9995
 
