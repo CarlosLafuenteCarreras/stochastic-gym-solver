@@ -36,44 +36,52 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
         decision = model.make_decision(observation)
         observation, reward, terminated, truncated, done = env.step(decision)
 
-        # Baseline penalties for neutral or negative actions
+        # Unpack the observation vector
+        x, y, v_x, v_y, angle, ang_vel, leg1, leg2 = observation
+
+        # Baseline penalties and amplification of positive rewards
         if -5 < reward < 0:
-            reward = -0.01
+            reward = -0.01 
         elif reward > 0:
             reward *= 2
 
-        # Penalize 'do nothing' excessively only if it doesn't reduce velocity
-        if decision == 0 and abs(observation[1]) > 0.1:
-            reward -= 1
-        else:
-            reward += 0.5
+        # Penalize inaction unless vertical velocity is negligible
+        if decision == 0:
+            if abs(v_y) > 0.1: 
+                reward -= 1 
+            else:
+                reward += 0.5
 
-        # Stabilize rotation towards zero
-        reward += 1.0 - abs(observation[2])
+        # Reward stabilizing rotation towards zero angle
+        reward += 1.0 - abs(angle)  
 
-        # Keep position close to the center (horizontal)
-        reward += max(0, 1.0 - abs(observation[0]))
+        # Reward proximity to the center (horizontal position)
+        reward += max(0, 1.0 - abs(x)) 
 
-        # Encourage low velocities
-        reward += max(0, 1.0 - abs(observation[1]))  # Horizontal velocity
-        reward += max(0, 1.0 - abs(observation[3]))  # Vertical velocity
+        # Reward reducing velocities (horizontal and vertical)
+        reward += max(0, 1.0 - abs(v_x)) 
+        reward += max(0, 1.0 - abs(v_y)) 
 
-        # Angular correction rewards
-        if observation[2] > 0 and decision == 3:  # Correct positive angle
+        # Reward angular correction actions
+        if angle > 0 and decision == 3:
             reward += 1.0
-        elif observation[2] < 0 and decision == 1:  # Correct negative angle
-            reward += 1.0
-
-        # Main engine steering rewards
-        if (observation[2] > 0 and observation[0] > 0 and decision == 2) or \
-        (observation[2] < 0 and observation[0] < 0 and decision == 2):
+        elif angle < 0 and decision == 1:
             reward += 1.0
 
-        # Reward for achieving stability thresholds
-        reward += max(0, 1.0 - abs(observation[0]))*2  # Horizontal position near center
-        reward += max(0, 1.0 - abs(observation[3]))    # Vertical velocity near zero
-        reward += max(0, 1.0 - abs(observation[1]))    # Horizontal velocity near zero
-        reward += max(0, 1.0 - abs(observation[2]))    # Angular velocity near zero
+        # Reward main engine steering for stabilizing both angle and position
+        if (angle > 0 and x > 0 and decision == 2) or \
+        (angle < 0 and x < 0 and decision == 2):
+            reward += 1.0
+
+        # Heavily reward achieving stability across all key metrics
+        reward += max(0, 1.0 - abs(x)) * 2 
+        reward += max(0, 1.0 - abs(v_y))
+        reward += max(0, 1.0 - abs(v_x))
+        reward += max(0, 1.0 - abs(ang_vel))
+
+        # Additional reward for landing successfully (both legs in contact)
+        if leg1 > 0 and leg2 > 0:
+            reward += 10
 
         fitness += reward
 
