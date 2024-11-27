@@ -40,7 +40,7 @@ def run():
         # # gravity is weaker
         instance.unwrapped.gravity = -10 # type: ignore
         # wind is weaker
-        instance.unwrapped.wind_power = 1.0 # type: ignore
+        instance.unwrapped.wind_power = 5.0 # type: ignore
         
         return instance
 
@@ -49,7 +49,7 @@ def run():
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
     params.hidden_layers = [16, 4]
-    params.model_penalty = 0.009
+    params.model_penalty = 0.01
 
     params.eposode_start = 0
     params.batch_size = 10
@@ -64,7 +64,7 @@ def run():
     params.sigma_random_small = 0.001
     params.sigma_random_big = 0.04
     params.learning_rate = 0.15
-    params.sigma = 1.5
+    params.sigma = 3
     params.npop = 30
 
 
@@ -155,8 +155,8 @@ def run():
 
         params.sigma *= 0.9995
 
-        if params.sigma < 0.5:
-            params.sigma = 1.5
+        if params.sigma < 0.8:
+            params.sigma = 3
 
         params.learning_rate *= 0.9995
 
