@@ -62,9 +62,9 @@ def run():
     params.step_randomness_to_w_small = 100
     params.step_randomness_to_w_big = 2000
     params.sigma_random_small = 0.001
-    params.sigma_random_big = 0.04
+    params.sigma_random_big = 0.02
     params.learning_rate = 0.15
-    params.sigma = 3
+    params.sigma = 1.5
     params.npop = 30
 
 
@@ -155,12 +155,12 @@ def run():
 
         params.sigma *= 0.9995
 
-        if params.sigma < 0.8:
-            params.sigma = 3
+        if params.sigma < 0.5:
+            params.sigma = 1.5
 
-        params.learning_rate *= 0.9995
+        params.learning_rate *= 0.999
 
-        if params.learning_rate < 0.07:
+        if params.learning_rate < 0.05:
             params.learning_rate = 0.25
 
         logger.add_scalar("sigma", params.sigma, i)
