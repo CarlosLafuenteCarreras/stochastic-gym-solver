@@ -32,13 +32,12 @@ def run():
     def make_env():
         instance = gym.make(params.env[0], **params.env[1])
 
-        instance.unwrapped.reward_shaping = True # type: ignore
         # reduce the penalty for crashing
         instance.unwrapped.crash_penalty = -100 # type: ignore
         # increase the reward for landing
         instance.unwrapped.landing_reward = 500 # type: ignore
         # # gravity is weaker
-        instance.unwrapped.gravity = -10 # type: ignore
+        #instance.unwrapped.gravity = -10 # type: ignore
         # wind is weaker
         instance.unwrapped.wind_power = 5.0 # type: ignore
         
