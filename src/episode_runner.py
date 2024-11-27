@@ -59,13 +59,13 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
 
         # Reward main engine steering for stabilizing both angle and position
         if (angle > 0 and x > 0 and decision == 2) or \
-        (angle < 0 and x < 0 and decision == 2):
+                (angle < 0 and x < 0 and decision == 2):
             reward += 0.00
 
         # Heavlily penalize going out of 2.0 rage off the center
         # if abs(x) > 1.25:
         #     reward -= 3
-        
+
         # if abs(x) > 2.0:
         #     reward -= 3
 
@@ -81,6 +81,11 @@ def run_once_thin(model: Model, env: gym.Env, max_steps: int):
         # if action is None and both legs are touching the ground
         if decision == 0 and leg1 == 1 and leg2 == 1:
             reward += 1
+
+        if decision == 2:
+            reward -= 0.5
+        elif decision == 1 or 3:
+            reward -= 0.05
 
         fitness += reward
 

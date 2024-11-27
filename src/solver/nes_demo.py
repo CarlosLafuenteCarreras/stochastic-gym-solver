@@ -73,8 +73,7 @@ def sample_distribution(model: NeuralNetworkModel, population: list[NeuralNetwor
   return samples
 
 def sample_distribution_numpy(theta: np.ndarray, population: np.ndarray, sigma: float, npop: int) -> np.ndarray:
-  samples = np.array([p(theta.shape, sigma, theta) for _ in range(npop)])
-  return samples
+  return np.array([p(theta.shape, sigma, theta) for _ in range(npop)])
 
 
   

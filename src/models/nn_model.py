@@ -57,8 +57,10 @@ class NeuralNetworkModel(Model, nn.Module):
         observation_tensor = torch.tensor(observation, dtype=torch.float32)
 
         output = self.forward(observation_tensor)
-        return np.array(np.argmax(output.detach().numpy()))
-    
+        #return np.array(np.argmax(output.detach().numpy()))
+        p = output.detach().numpy()
+        return np.random.choice(np.arange(4), p=p/np.sum(p))
+
     def get_parameters_dict(self) -> dict:
         parameters = {}
         for name, param in self.linear.named_parameters():
