@@ -58,12 +58,12 @@ def run():
     params.episodes = 50_000
 
     # hiperparameters
-    params.step_randomness_to_w_small = 100
+    params.step_randomness_to_w_small = 100000
     params.step_randomness_to_w_big = 2000
     params.sigma_random_small = 0.0
     params.sigma_random_big = 0.001
-    params.learning_rate = 0.15
-    params.sigma = 1.5
+    params.learning_rate = 0.1
+    params.sigma = 0.25
     params.npop = 30
 
 
@@ -154,13 +154,13 @@ def run():
 
         params.sigma *= 0.9995
 
-        if params.sigma < 0.5:
-            params.sigma = 1.5
+        if params.sigma < 0.05:
+            params.sigma = 0.25
 
         params.learning_rate *= 0.999
 
         if params.learning_rate < 0.05:
-            params.learning_rate = 0.25
+            params.learning_rate = 0.1
 
         logger.add_scalar("sigma", params.sigma, i)
 
