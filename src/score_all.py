@@ -7,22 +7,27 @@ import tensorboardX
 from models.nn_model import NeuralNetworkModel
 
 def run_fitness(model, env: gym.Env, max_steps: int) -> float:
-    observation, info = env.reset(seed=42)
+    total_fitness = 0.0
+    num_runs = 50
 
-    fitness = 0.0
+    for _ in range(num_runs):
+        observation, info = env.reset(seed=42)
+        fitness = 0.0
 
-    for i in range(max_steps):
-        observation = torch.tensor(observation, dtype=torch.float32)
-        action = model(observation)
-        action = np.argmax(action.detach().numpy())
-        observation, reward, terminated, truncated, _ = env.step(action)
+        for i in range(max_steps):
+            observation = torch.tensor(observation, dtype=torch.float32)
+            action = model(observation)
+            action = np.argmax(action.detach().numpy())
+            observation, reward, terminated, truncated, _ = env.step(action)
 
-        fitness += float(reward)
+            fitness += float(reward)
 
-        if terminated or truncated:
-            return fitness
+            if terminated or truncated:
+                break
         
-    return fitness
+        total_fitness += fitness
+
+    return total_fitness / num_runs
 def make_env():
     instance = gym.make("LunarLander-v3", continuous=False)
     
@@ -33,7 +38,7 @@ def get_episode(resume: str):
     return int(resume.split("_")[-1].split(".")[0])
 
 def main():
-    TO_SCORE_PATH = "./retain"
+    TO_SCORE_PATH = "./models"
 
     import os
     import tqdm
