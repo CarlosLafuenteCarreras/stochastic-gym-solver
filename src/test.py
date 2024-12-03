@@ -9,17 +9,6 @@ from models.nn_model import NeuralNetworkModel
 def make_env():
     instance = gym.make("LunarLander-v3", continuous=False, render_mode="human")
 
-    instance.unwrapped.reward_shaping = True # type: ignore
-    # reduce the penalty for crashing
-    instance.unwrapped.crash_penalty = -10 # type: ignore
-    # # reduce initial velocity
-    # print(dir(instance.unwrapped))
-    instance.unwrapped.initial_random = 0.00 # type: ignore
-    # # gravity is weaker
-    instance.unwrapped.gravity = -3 # type: ignore
-    # wind is weaker
-    #instance.unwrapped.wind_power = 0 # type: ignore
-    
     return instance
 
 env = make_env()
