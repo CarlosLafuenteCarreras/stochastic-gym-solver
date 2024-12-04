@@ -52,8 +52,8 @@ def run():
 
     params.eposode_start = 0
     params.batch_size = 10
-    params.repetitions = 100
-    params.max_steps = 200
+    params.repetitions = 200
+    params.max_steps = 150
 
     params.episodes = 50_000
 
@@ -62,9 +62,9 @@ def run():
     params.step_randomness_to_w_big = 2000
     params.sigma_random_small = 0.0
     params.sigma_random_big = 0.001
-    params.learning_rate = 0.1
-    params.sigma = 0.25
-    params.npop = 30
+    params.learning_rate = 0.15
+    params.sigma = 0.6
+    params.npop = 15
 
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
@@ -152,15 +152,15 @@ def run():
             torch.save(w, descrp)
 
 
-        params.sigma *= 0.9995
+        params.sigma *= 0.999
 
-        if params.sigma < 0.05:
-            params.sigma = 0.25
+        if params.sigma < 0.1:
+            params.sigma = 0.6
 
         params.learning_rate *= 0.999
 
         if params.learning_rate < 0.05:
-            params.learning_rate = 0.1
+            params.learning_rate = 0.15
 
         logger.add_scalar("sigma", params.sigma, i)
 

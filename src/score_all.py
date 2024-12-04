@@ -4,30 +4,10 @@ import argparse
 import torch
 import episode_runner
 import tensorboardX
+from episode_runner_raw import run_simulation
 from models.nn_model import NeuralNetworkModel
 
-def run_fitness(model, env: gym.Env, max_steps: int) -> float:
-    total_fitness = 0.0
-    num_runs = 50
 
-    for _ in range(num_runs):
-        observation, info = env.reset(seed=42)
-        fitness = 0.0
-
-        for i in range(max_steps):
-            observation = torch.tensor(observation, dtype=torch.float32)
-            action = model(observation)
-            action = np.argmax(action.detach().numpy())
-            observation, reward, terminated, truncated, _ = env.step(action)
-
-            fitness += float(reward)
-
-            if terminated or truncated:
-                break
-        
-        total_fitness += fitness
-
-    return total_fitness / num_runs
 def make_env():
     instance = gym.make("LunarLander-v3", continuous=False)
     
@@ -51,7 +31,8 @@ def main():
                 model_path = os.path.join(TO_SCORE_PATH, model)
                 model = torch.load(model_path, weights_only=False)
                 env = make_env()
-                fitness = run_fitness(model, env, max_steps=1000)
+                fitness = run_simulation([model], env, 200, repetitions=200, batch_size=10, progress_bar=False, make_env=make_env)
+                fitness = fitness[0].mean()
                 values.append((model_path, fitness, get_episode(model_path)))
             except Exception as e:
                 print(f"Error with model {model}: {e}")
