@@ -15,7 +15,7 @@ Stochastic Gym Solver is a project that applies the **Natural Evolution Strategi
 - **Maciej Złotorowicz**  
   - Akademia Górniczo-Hutnicza  [GitHub](https://github.com/Lord225) 
 
-![](videos/Lander-Sample.mp4)
+![](https://www.youtube.com/watch?v=NRX6X9aTKds)
 
 ## Features
 
