@@ -15,6 +15,8 @@ Stochastic Gym Solver is a project that applies the **Natural Evolution Strategi
 - **Maciej Złotorowicz**  
   - Akademia Górniczo-Hutnicza  [GitHub](https://github.com/Lord225) 
 
+![](/resources/videos/Lander-Sample.mp4)
+
 ## Features
 
 - **NES Algorithm**: Implements Natural Evolution Strategies for optimization.
