@@ -48,7 +48,7 @@ def run():
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
     params.hidden_layers = [16, 4]
-    params.model_penalty = 0.01
+    params.model_penalty = 0.0
 
     params.eposode_start = 0
     params.batch_size = 10
@@ -58,12 +58,12 @@ def run():
     params.episodes = 50_000
 
     # hiperparameters
-    params.step_randomness_to_w_small = 100000
+    params.step_randomness_to_w_small = 100
     params.step_randomness_to_w_big = 2000
-    params.sigma_random_small = 0.0
-    params.sigma_random_big = 0.001
+    params.sigma_random_small = 0.0001
+    params.sigma_random_big = 0.0
     params.learning_rate = 0.15
-    params.sigma = 0.6
+    params.sigma = 0.15
     params.npop = 15
 
 
@@ -154,13 +154,13 @@ def run():
 
         params.sigma *= 0.999
 
-        if params.sigma < 0.1:
-            params.sigma = 0.6
+        if params.sigma < 0.05:
+            params.sigma = 0.1
 
         params.learning_rate *= 0.999
 
         if params.learning_rate < 0.05:
-            params.learning_rate = 0.15
+            params.learning_rate = 0.1
 
         logger.add_scalar("sigma", params.sigma, i)
 
