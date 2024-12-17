@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='Stochastic Neural Network')
 parser.add_argument("--resume", type=str, default=None, help="model")
 
 args = parser.parse_args()
-
+# TODO: add save_as_csv as parse argument
 
 model_path = args.resume
 
