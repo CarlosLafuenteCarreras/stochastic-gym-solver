@@ -35,11 +35,11 @@ def run():
         # reduce the penalty for crashing
         instance.unwrapped.crash_penalty = -100 # type: ignore
         # increase the reward for landing
-        instance.unwrapped.landing_reward = 250 # type: ignore
+        instance.unwrapped.landing_reward = 500 # type: ignore
         # # gravity is weaker
         #instance.unwrapped.gravity = -10 # type: ignore
         # wind is weaker
-        #instance.unwrapped.wind_power = 16.0 # type: ignore
+        instance.unwrapped.wind_power = 5.0 # type: ignore
         
         return instance
 
@@ -48,23 +48,23 @@ def run():
     params.input_size = env.observation_space.shape[0] # type: ignore
     params.output_size = env.action_space.shape[0] if isinstance(env.action_space, gym.spaces.Box) else env.action_space.n # type: ignore
     params.hidden_layers = [16, 4]
-    params.model_penalty = 0.0
+    params.model_penalty = 0.01
 
     params.eposode_start = 0
     params.batch_size = 10
-    params.repetitions = 200
-    params.max_steps = 150
+    params.repetitions = 100
+    params.max_steps = 300
 
     params.episodes = 50_000
 
     # hiperparameters
     params.step_randomness_to_w_small = 100
     params.step_randomness_to_w_big = 2000
-    params.sigma_random_small = 0.0001
-    params.sigma_random_big = 0.0
+    params.sigma_random_small = 0.001
+    params.sigma_random_big = 0.02
     params.learning_rate = 0.15
-    params.sigma = 0.15
-    params.npop = 15
+    params.sigma = 1.5
+    params.npop = 30
 
 
     w = NeuralNetworkModel(params.input_size, params.output_size, params.hidden_layers)
@@ -152,15 +152,15 @@ def run():
             torch.save(w, descrp)
 
 
-        params.sigma *= 0.999
+        params.sigma *= 0.9995
 
-        if params.sigma < 0.05:
-            params.sigma = 0.1
+        if params.sigma < 0.5:
+            params.sigma = 1.5
 
         params.learning_rate *= 0.999
 
         if params.learning_rate < 0.05:
-            params.learning_rate = 0.1
+            params.learning_rate = 0.25
 
         logger.add_scalar("sigma", params.sigma, i)
 
