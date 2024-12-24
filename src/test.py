@@ -44,6 +44,7 @@ for _ in range(N):
    action = np.argmax(action.detach().numpy())
    if save_as_csv:
         csv_data += ','.join([str(round(float(i),2)) for i in observation.to('cpu').detach().numpy()]) + "," + str(action) + "\n"
+        print(_) if _ % 100 == 0 else None
 
    #print(action, '\t'.join([str(round(float(i),2)) for i in observation.to('cpu').detach().numpy()]))
    observation, reward, terminated, truncated, info = env.step(action)
