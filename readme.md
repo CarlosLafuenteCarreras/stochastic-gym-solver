@@ -6,7 +6,7 @@ Stochastic Gym Solver is a project that applies the **Natural Evolution Strategi
 
 The **complete project documentation**, including the Theoretical Framework, Formal Problem Description, Agent Architecture details, Implementation Methodology, and detailed Results Analysis, can be found in the final report:
 
-* **[Final Report: Solving the moon landing environment with a stochastically trained neural network](Final%20Report%20Solving%20the%20moon%20landing%20environment%20with%20a%20stochastically%20trained%20neural%20network.pdf)**
+* **[Final Report: Solving the moon landing environment with a stochastically trained neural network](moon-landing.pdf)**
     * *This document serves as the theoretical foundation for the code and details the implementation of the Natural Evolution Strategies (NES) algorithm, stochastic adaptations, and Custom Reward Shaping.*
 
 ---
