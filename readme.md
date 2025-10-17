@@ -2,6 +2,14 @@
 
 Stochastic Gym Solver is a project that applies the **Natural Evolution Strategies (NES)** algorithm to solve the **LunarLander-v3** environment from OpenAI's Gymnasium. The project introduces stochastic adaptations, techniques and custom reward shaping to enhance the agent's performance and training time.
 
+## 📄 Technical Report and Theoretical Basis
+
+The **complete project documentation**, including the Theoretical Framework, Formal Problem Description, Agent Architecture details, Implementation Methodology, and detailed Results Analysis, can be found in the final report:
+
+* **[Final Report: Solving the moon landing environment with a stochastically trained neural network](Final%20Report%20Solving%20the%20moon%20landing%20environment%20with%20a%20stochastically%20trained%20neural%20network.pdf)**
+    * *This document serves as the theoretical foundation for the code and details the implementation of the Natural Evolution Strategies (NES) algorithm, stochastic adaptations, and Custom Reward Shaping.*
+
+---
 ![](/resources/small_model/Animation.gif)
 
 ## Authors
@@ -10,7 +18,7 @@ Stochastic Gym Solver is a project that applies the **Natural Evolution Strategi
   - University of Hamburg  
 - **Juan Rubio**  
   - University of Zaragoza  
-- **Carlos Lafuente**  [Github](https://github.com/juanchinunizar)
+- **Carlos Lafuente**  [Github](https://github.com/CarlosLafuenteCarreras)
   - University of Zaragoza  
 - **Maciej Złotorowicz**  
   - Akademia Górniczo-Hutnicza  [GitHub](https://github.com/Lord225) 
